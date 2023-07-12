@@ -5,6 +5,7 @@ const port: Number = 8000;
 const app: Express = express();
 
 app.use(express.json());
+//개시판
 app.use("/bulletin-board", bulletinBoardRouter);
 
 app.listen(port, () => {
