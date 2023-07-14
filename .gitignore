@@ -3,3 +3,4 @@ dist
 .vscode
 .env
 *.jpg
+.DS_Store
