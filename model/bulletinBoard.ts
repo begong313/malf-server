@@ -1,6 +1,5 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { BulletinBoardDAO } from "./DAOBulletinBoard";
-import fs from "fs";
 
 function getPostList(request: Request, response: Response): void {
     const bulletinBoardDAO: BulletinBoardDAO = new BulletinBoardDAO(
@@ -38,14 +37,27 @@ function deletePost(request: Request, response: Response) {
 }
 
 function picTest(request: Request, response: Response) {
-    const imageBuffer: Buffer = request.body;
-    console.log(request);
-    fs.writeFile("test1.jpg", imageBuffer, "binary", (err) => {
-        if (err) {
-            console.log(err);
-            response.status(500).send("fail save");
-        }
-        response.send("saved");
-    });
+    // 전처리 및 파일저장
+    console.log(request.files);
+    // console.log(request.body);
+    // console.log(request.body.title);
+
+    const bulletinBoardDAO: BulletinBoardDAO = new BulletinBoardDAO(
+        request,
+        response
+    );
+    //첨부사진이 없을 때
+    if (request.files == undefined) {
+        bulletinBoardDAO.createPost();
+        return;
+    }
+    console.log(typeof request.files);
+    const imageFiles: any = request.files; //타입뭐지?
+    var picDIRList: string[] = [];
+    //사진 dir정보
+    for (var i = 0; i < imageFiles.length; i++) {
+        picDIRList.push(imageFiles[i].filename);
+    }
+    bulletinBoardDAO.createPost(picDIRList);
 }
 export { createPost, getPostList, getPostDetail, deletePost, picTest };
