@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import pool from "./dbConnector";
 import { ServerResponse } from "./ServerResponse";
 import { OkPacket } from "mysql";
+import { stringify } from "querystring";
 
 export class BulletinBoardDAO {
     private serverResponse: ServerResponse;
@@ -44,12 +45,15 @@ export class BulletinBoardDAO {
     }
 
     // 글쓰기 기능
-    public createPost(): void {
-        this.createPostQuery();
+    public createPost(picDIR?: string[]): void {
+        if (picDIR == undefined) {
+            picDIR = ["https://zrr.kr/gx9b", "https://zrr.kr/gx9b"];
+        }
+        this.createPostQuery(picDIR);
         return;
     }
 
-    private createPostQuery(): void {
+    private createPostQuery(picDIR: string[]): void {
         const request = this.request;
         const response = this.response;
         const serverResponse = this.serverResponse;
@@ -57,7 +61,7 @@ export class BulletinBoardDAO {
             `Insert into post (title, content, picture, capacity, location, start_time, user_e_mail) values (
                     "${request.body.title}",
                     "${request.body.content}",
-                    "https://zrr.kr/gx9b",
+                    '${JSON.stringify(picDIR)}',
                     "${
                         Number(request.body.capacity_local) +
                         Number(request.body.capacity_travel)
