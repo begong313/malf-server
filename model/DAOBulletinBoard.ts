@@ -47,7 +47,8 @@ export class BulletinBoardDAO {
     // 글쓰기 기능
     public createPost(picDIR?: string[]): void {
         if (picDIR == undefined) {
-            picDIR = ["https://zrr.kr/gx9b", "https://zrr.kr/gx9b"];
+            picDIR = ["1689420845357-762903864.jpeg"];
+            //Defalut 사진
         }
         this.createPostQuery(picDIR);
         return;
