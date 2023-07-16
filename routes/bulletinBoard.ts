@@ -1,14 +1,13 @@
 import { Router } from "express";
 import cors from "cors";
 import upload from "./bulletinBoardMulter";
-
 import {
     createPost,
     getPostDetail,
     getPostList,
     deletePost,
     picTest,
-} from "../model/bulletinBoard";
+} from "../controller/bulletinBoard";
 
 const router: Router = Router();
 
