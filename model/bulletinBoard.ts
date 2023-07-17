@@ -25,7 +25,7 @@ export class BulletinBoardDAO {
         this.response = response;
     }
 
-    // 글의 list가저올때 동작
+    // 글의 list가져오기
     public getPostList(): void {
         this.getPostListQuery();
         return;
@@ -40,10 +40,19 @@ export class BulletinBoardDAO {
                         post.capacity as meeting_capacity, post.picture as meeting_pic,
                         post.location as meeting_location, post.start_time as meeting_start_time
                         from user join post on user.e_mail = post.user_e_mail order by post.post_id`,
-            function (err: Error, result: OkPacket) {
+            function (err: Error, result: any) {
                 if (err) {
                     response.json(serverresponse.FailResponse());
                     return;
+                }
+
+                // list 보낼때 사진 하나씩 보내기위해 만듦
+                for (var i = 0; i < result.length; i++) {
+                    console.log(JSON.parse(result[i].meeting_pic)[0]);
+                    result[i].meeting_pic = JSON.parse(
+                        result[i].meeting_pic
+                    )[0];
+                    console.log(result[i]);
                 }
                 response.json(serverresponse.getOKResponse(result));
                 return;
@@ -111,7 +120,7 @@ export class BulletinBoardDAO {
                 post.start_time as meeting_start_time, post.like_count, post.like_check, post.participantion_status
                 from post join user on post.user_e_mail = user.e_mail
                 where post_id = "${post_id}"`,
-            function (err: Error, result: OkPacket) {
+            function (err: Error, result: any) {
                 if (err) {
                     response.json(serverResponse.FailResponse());
                     return;
@@ -132,7 +141,7 @@ export class BulletinBoardDAO {
         const serverResponse: ServerResponse = this.serverResponse;
         pool.query(
             `Delete from post where post_id = "${post_id}";`,
-            function (err: Error, result: OkPacket) {
+            function (err: Error) {
                 if (err) {
                     response.json(serverResponse.FailResponse());
                     return;
