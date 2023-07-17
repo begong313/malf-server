@@ -125,6 +125,13 @@ export class BulletinBoardDAO {
                     response.json(serverResponse.FailResponse());
                     return;
                 }
+                for (var i = 0; i < result.length; i++) {
+                    console.log(JSON.parse(result[i].author_picture)[0]);
+                    result[i].author_picture = JSON.parse(
+                        result[i].author_picture
+                    )[0];
+                    console.log(result[i]);
+                }
                 response.json(serverResponse.getOKResponse(result));
             }
         );
