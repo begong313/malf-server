@@ -1,8 +1,4 @@
 node_modules
-dist
-.vscode
-.env
-*.jpg
 .DS_Store
-*.png
-public/images
+.env
+dist
