@@ -3,19 +3,17 @@ import passport from "passport";
 
 const router: Router = express.Router();
 
-router.get("/", (request: Request, response: Response) => {
-    response.send("sdfsd");
-});
-
 router.get("/kakao", passport.authenticate("kakao"));
 
 router.get(
     "/kakao/callback",
     passport.authenticate("kakao", {
+        session: false,
         failureRedirect: "/",
     }),
     (request: Request, response: Response) => {
-        response.redirect("/success");
+        const jwtToken = request.user;
+        response.json({ token: jwtToken });
     }
 );
 

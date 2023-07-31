@@ -1,35 +1,16 @@
-import express, { Express, Request, Response, response } from "express";
-import pool from "./lib/dbConnector";
+import express, { Express } from "express";
 import authRtouer from "./routes/auth";
-import passportConfig from "./passport";
-import session from "express-session";
-var FileStore = require("session-file-store")(session);
-
+import passportInit from "./passport";
+import userRouter from "./routes/user";
 const app: Express = express();
 
 app.set("port", process.env.PORT || 8000);
-app.use(
-    session({
-        secret: "asadlfkj!@#!@#dfgasdg",
-        resave: false,
-        saveUninitialized: true,
-        store: new FileStore(),
-    })
-);
 
-passportConfig();
+passportInit();
 
 app.use("/auth", authRtouer);
+app.use("/user", userRouter);
 
-app.get("/", (request: Request, response: Response) => {
-    pool.query(`select * from user_id`, function (error, result) {
-        console.log(result);
-        response.json(result);
-    });
-});
-app.get("/success", (request: Request, response: Response) => {
-    response.send("success");
-});
 app.listen(app.get("port"), () => {
     console.log("8000번에서 동작중 ");
 });

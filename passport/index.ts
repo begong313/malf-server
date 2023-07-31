@@ -1,7 +1,7 @@
 import passport from "passport";
 import kakao from "./kakaoStratgy";
 
-function passportConfig() {
+function passportInit() {
     passport.serializeUser((user, done) => {
         console.log(user);
         done(null, user);
@@ -15,4 +15,4 @@ function passportConfig() {
     kakao();
 }
 
-export default passportConfig;
+export default passportInit;
