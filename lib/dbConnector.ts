@@ -1,5 +1,5 @@
 import mysql from "mysql2";
-import dbConnectData from "../config/config";
+import dbConnectData from "../config/db_config";
 
 const env: string = process.env.NODE_ENV || "development";
 
