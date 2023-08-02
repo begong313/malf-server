@@ -11,7 +11,7 @@ router.post(
     verifyToken,
     upload.array("image", 10),
     firstSetInfo
-);
+); // 첫 실행시 유저정보 등록창
 
 router.get("/test", verifyToken, (req, res) => {
     console.log(res.locals.decoded);
