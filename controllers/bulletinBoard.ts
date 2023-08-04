@@ -13,6 +13,7 @@ todo : page-nation
 function getPostList(request: Request, response: Response): void {
     const page: number = Number(request.query.page) || 1;
     const limit: number = Number(request.query.limit) || 100;
+    console.log(page, limit);
     pool.query(
         `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
     user_require_info.nation as author_nation, user_require_info.user_type as user_type,

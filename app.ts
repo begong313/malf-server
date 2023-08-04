@@ -5,6 +5,7 @@ import userRouter from "./routes/user";
 import bulletinboardRouter from "./routes/bulletinBoard";
 import chatRouter from "./routes/chatRoom";
 import picRouter from "./routes/picture";
+import adRouter from "./routes/ad";
 import cors from "cors";
 
 const app: Express = express();
@@ -27,6 +28,7 @@ app.use("/auth", authRtouer);
 app.use("/user", userRouter);
 app.use("/bulletin-board", bulletinboardRouter);
 app.use("/chatroom", chatRouter);
+app.use("/ad", adRouter);
 app.use("/", picRouter);
 
 app.listen(app.get("port"), () => {
