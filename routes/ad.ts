@@ -17,13 +17,13 @@ router.get("/list", (resquest: Request, response: Response) => {
                 href_url: "www.naver.com",
             },
             {
-                pic_url: "ad.1.png",
+                pic_url: "ad/1.png",
                 href_url: "www.naver.com",
             },
         ],
         middle_ad: [
             {
-                pic_url: "ad.2.png",
+                pic_url: "ad/2.png",
                 href_url: "www.daum.com",
             },
         ],
