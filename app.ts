@@ -17,10 +17,10 @@ passportInit();
 //cors origin error 대비
 app.use(cors());
 
-app.use("/favicon.ico", (req, res, next) => {
-    // 파비콘 요청에 대해 404 Not Found 응답을 보냅니다.
-    res.status(404).end();
-});
+// app.use("/favicon.ico", (req, res, next) => {
+//     // 파비콘 요청에 대해 404 Not Found 응답을 보냅니다.
+//     res.status(404).end();
+// });
 
 //Router Setting
 app.use("/auth", authRtouer);
