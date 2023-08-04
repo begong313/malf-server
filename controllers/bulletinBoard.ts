@@ -20,11 +20,14 @@ function getPostList(request: Request, response: Response): void {
         (err: MysqlError, results: OkPacket) => {
             if (err) {
                 response.status(400).json({
-                    Code: 400,
+                    status: 400,
                     message: "글 조회 실패",
                 });
             }
-            response.json(results);
+            response.status(200).json({
+                status: 200,
+                data: results,
+            });
         }
     );
 }
@@ -36,7 +39,7 @@ function createPost(request: Request, response: Response) {
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
     if (request.headers.authorization == undefined) {
         response.status(400).json({
-            Code: 400,
+            status: 400,
             message: "사용자 정보가 없습니다",
         });
         return;
@@ -84,7 +87,7 @@ function createPost(request: Request, response: Response) {
                     if (err) {
                         console.log(err);
                         response.status(400).json({
-                            Code: 400,
+                            status: 400,
                             message: "글 등록 실패",
                         });
                         return;
@@ -107,7 +110,7 @@ function getPostDetail(request: Request, response: Response): void {
     const user_uniq_id: any = request.headers.authorization; //todo
     if (request.headers.authorization == undefined) {
         response.status(400).json({
-            Code: 400,
+            status: 400,
             message: "사용자 정보가 없습니다",
         });
         return;
@@ -195,7 +198,7 @@ function pushLike(request: Request, response: Response) {
     const user_uniq_id = request.headers.authorization; //todo
     if (request.headers.authorization == undefined) {
         response.status(400).json({
-            Code: 400,
+            status: 400,
             message: "사용자 정보가 없습니다",
         });
         return;
