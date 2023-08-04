@@ -24,7 +24,7 @@ router.get("/list", (resquest: Request, response: Response) => {
         middle_ad: [
             {
                 pic_url: "ad/2.png",
-                href_url: "www.daum.com",
+                href_url: "www.daum.net",
             },
         ],
     });
