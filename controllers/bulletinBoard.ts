@@ -11,12 +11,15 @@ import { MysqlError, OkPacket } from "mysql";
 todo : page-nation
 */
 function getPostList(request: Request, response: Response): void {
+    const page: number = Number(request.query.page) || 1;
+    const limit: number = Number(request.query.limit) || 100;
     pool.query(
         `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
     user_require_info.nation as author_nation, user_require_info.user_type as user_type,
     post.capacity as meeting_capacity, post.picture as meeting_pic,
     post.location as meeting_location, post.start_time as meeting_start_time
-    from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id`,
+    from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
+    Limit ${limit} offset ${(page - 1) * limit}`,
         (err: MysqlError, results: OkPacket) => {
             if (err) {
                 response.status(400).json({
@@ -126,12 +129,19 @@ function getPostDetail(request: Request, response: Response): void {
             (case when exists (select 1 from post_participation where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as participation_status
             from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
             where post_id = "${post_id}"`,
-        (err, results) => {
+        (err: MysqlError, results: any) => {
             if (err) {
                 console.log(err);
                 response.status(400).json({
                     status: 400,
                     message: "글 불러오기 실패",
+                });
+                return;
+            }
+            if (results.length == 0) {
+                response.status(400).json({
+                    status: 400,
+                    message: "없는 글입니다.",
                 });
                 return;
             }
