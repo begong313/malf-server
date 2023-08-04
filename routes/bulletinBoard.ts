@@ -17,11 +17,11 @@ const router: Router = Router();
 
 router.get("/posts", getPostList); //홈화면 글 리스트 불러오기
 router.post("/posts", upload.array("image", 10), createPost); //글작성, 사진 최대 개수 10개
+
 router.get("/posts/:id", getPostDetail); //글 세부창 불러오기
 router.patch("/post/:id", updatePost); // 글 업데이트
 router.delete("/posts/:id", deletePost); //글 삭제
 
-router.post("posts/:id/like", pushLike); //좋아요 클릭
-
+router.post("/posts/:id/like", pushLike); //좋아요 클릭
 //todo : api문서 주소 업데이트. 모두 Posts로 주소를 바꿨음.
 export default router;

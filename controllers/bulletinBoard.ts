@@ -34,6 +34,13 @@ function getPostList(request: Request, response: Response): void {
 */
 function createPost(request: Request, response: Response) {
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
+    if (request.headers.authorization == undefined) {
+        response.status(400).json({
+            Code: 400,
+            message: "사용자 정보가 없습니다",
+        });
+        return;
+    }
     const postBody = {
         title: request.body.title,
         content: request.body.content,
@@ -41,7 +48,8 @@ function createPost(request: Request, response: Response) {
         capacity_travel: request.body.capacity_travel,
         meeting_location: request.body.meeting_location,
         meeting_start_time: request.body.meeting_start_time,
-        user_uniq_id: "k_2940915568", //todo,
+        user_uniq_id: request.headers.authorization, //test용 코드. 추후 header에서 값 추출 필요
+        category: request.body.category, // 카테고리는 미완성임
     };
     const imageFiles: any = request.files;
     var picDIRList: string[] = []; //사진 경로 담을 array
@@ -67,7 +75,7 @@ function createPost(request: Request, response: Response) {
             "${postBody.meeting_location}",
             "${postBody.meeting_start_time}",
             "${postBody.user_uniq_id}",
-            "1")`,
+            "${postBody.category}")`,
         (err: MysqlError, results: OkPacket) => {
             // 글쓴이는 바로 채팅방 입장
             pool.query(
@@ -96,13 +104,23 @@ function createPost(request: Request, response: Response) {
 */
 function getPostDetail(request: Request, response: Response): void {
     const post_id: string = request.params.id;
-    const user_uniq_id: string = "k_2940915568"; //todo
+    const user_uniq_id: any = request.headers.authorization; //todo
+    if (request.headers.authorization == undefined) {
+        response.status(400).json({
+            Code: 400,
+            message: "사용자 정보가 없습니다",
+        });
+        return;
+    }
     pool.query(
         `select
             post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
             user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
             post.capacity as meeting_capacity, post.picture as meeting_pic, post.location as meeting_location,
-            post.start_time as meeting_start_time, (select count(*) from post_like where post_id = "${post_id}")as like_count,(case when exists (select 1 from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as like_check, (case when exists (select 1 from post_participation where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as participation_status
+            post.start_time as meeting_start_time, post.category_id as category,
+            (select count(*) from post_like where post_id = "${post_id}")as like_count,
+            (case when exists (select 1 from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as like_check, 
+            (case when exists (select 1 from post_participation where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as participation_status
             from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
             where post_id = "${post_id}"`,
         (err, results) => {
@@ -135,18 +153,38 @@ function deletePost(request: Request, response: Response) {
     // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
     const post_id: string = request.params.id;
     pool.query(
-        `Delete from post where post_id = "${post_id}";`,
-        function (err: MysqlError) {
-            if (err) {
+        `select user_uniq_id from post where post_id = "${post_id}"`,
+        (err: MysqlError, results: any) => {
+            if (results.length == 0) {
                 response.status(400).json({
                     status: 400,
-                    message: "글 삭제 실패",
+                    message: " 존재하지 않는 글입니다",
                 });
                 return;
             }
-            response.status(200).json({
-                status: 200,
-            });
+            if (results[0].user_uniq_id != request.headers.authorization) {
+                response.status(400).json({
+                    status: 400,
+                    message: " 권한이 없습니다.",
+                });
+                return;
+            }
+            pool.query(
+                `Delete from post where post_id = "${post_id}";`,
+                function (err: MysqlError) {
+                    if (err) {
+                        response.status(400).json({
+                            status: 400,
+                            message: "글 삭제 실패",
+                        });
+                        return;
+                    }
+                    response.status(200).json({
+                        status: 200,
+                        message: "글 삭제 성공",
+                    });
+                }
+            );
         }
     );
 }
@@ -154,11 +192,18 @@ function deletePost(request: Request, response: Response) {
 /*좋아요 버튼 눌렀을때의 동작 */
 function pushLike(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id: string = "k_2940915568"; //todo
+    const user_uniq_id = request.headers.authorization; //todo
+    if (request.headers.authorization == undefined) {
+        response.status(400).json({
+            Code: 400,
+            message: "사용자 정보가 없습니다",
+        });
+        return;
+    }
 
-    const selectQuery: string = `select * from post_like where post_id = "${post_id} and user_uniq_id = "${user_uniq_id}"`;
+    const selectQuery: string = `select * from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}"`;
     const insertQuery: string = `insert into post_like (post_id, user_uniq_id) values ("${post_id}", "${user_uniq_id}")`;
-    const deleteQuery: string = `delete from post_like where post_id = "${post_id} and user_uniq_id = "${user_uniq_id}"`;
+    const deleteQuery: string = `delete from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}"`;
 
     pool.query(selectQuery, (err: MysqlError, results: any[]) => {
         if (err) {
@@ -176,16 +221,16 @@ function pushLike(request: Request, response: Response) {
                     console.log("mysql err", err);
                     response.status(400).json({
                         status: 400,
-                        message: "삭제실패",
+                        message: "좋아요 삭제실패",
                     });
                     return;
                 }
                 response.status(200).json({
                     status: 200,
-                    message: "삭제성공",
+                    message: "좋아요 삭제성공",
                 });
-                return;
             });
+            return;
         }
         //좋아요 등록
         pool.query(insertQuery, (err: MysqlError) => {
@@ -193,7 +238,7 @@ function pushLike(request: Request, response: Response) {
                 console.log("mysql err", err);
                 response.status(400).json({
                     status: 400,
-                    message: "등록실패",
+                    message: "좋아요 등록실패",
                 });
                 return;
             }
