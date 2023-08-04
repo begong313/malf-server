@@ -11,7 +11,6 @@ interface DbConfig {
         database: string | undefined;
     };
 }
-
 const dbConnectData: DbConfig = {
     development: {
         host: "127.0.0.1",
