@@ -19,7 +19,13 @@ const dbConnectData: DbConfig = {
         password: process.env.LOCAL_MYSQL_PW,
         database: "malf_testDB",
     },
-
+    test: {
+        host: process.env.MALF_DB_HOST,
+        port: 3306,
+        user: "dbmasteruser",
+        password: process.env.LIVE_MYSQL_PW,
+        database: "malf_testDB",
+    },
     production: {
         host: process.env.MALF_DB_HOST,
         port: 3306,

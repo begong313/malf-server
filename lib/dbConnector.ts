@@ -10,7 +10,7 @@ pool.getConnection((error) => {
         console.error("fail to connect", error);
         return;
     }
-    console.log("db connect success");
+    console.log(env, "db connect success");
 });
 
 export default pool;

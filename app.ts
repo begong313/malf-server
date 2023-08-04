@@ -30,5 +30,6 @@ app.use("/chatroom", chatRouter);
 app.use("/", picRouter);
 
 app.listen(app.get("port"), () => {
+    console.log(process.env.NODE_ENV, "에서 동작중");
     console.log("8000번에서 동작중 ");
 });
