@@ -15,12 +15,10 @@ router.post(
 
 router.get("/test", verifyToken, (req, res) => {
     console.log(res.locals.decoded);
-    pool.query(
-        `select * from user_id where user_uniq_id = "${res.locals.decoded.user_uniq_id}"`,
-        (err, results) => {
-            console.log(results);
-        }
-    );
+    const query = "select * from user_id where user_uniq_id = ?";
+    const values = res.locals.decoded.user_uniq_id;
+    const rows = pool.execute(query, values);
+    console.log(rows);
     res.send("token auth success");
 });
 export default router;

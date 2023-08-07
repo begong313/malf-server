@@ -1,7 +1,7 @@
 import express, { Express } from "express";
 import authRtouer from "./routes/auth";
 import passportInit from "./passport";
-import userRouter from "./routes/user";
+import userRouter from "./routes/userInfo";
 import bulletinboardRouter from "./routes/bulletinBoard";
 import chatRouter from "./routes/chatRoom";
 import picRouter from "./routes/picture";
@@ -24,7 +24,7 @@ app.use(cors());
 // });
 
 //Router Setting
-app.use("/auth", authRtouer);
+app.use("/auth", authRtouer); //회원가입
 app.use("/user", userRouter);
 app.use("/bulletin-board", bulletinboardRouter);
 app.use("/chatroom", chatRouter);

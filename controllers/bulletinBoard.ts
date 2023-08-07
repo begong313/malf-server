@@ -5,41 +5,40 @@ bulletinBoard controller
 import { Request, Response } from "express";
 import pool from "../lib/dbConnector";
 import { MysqlError, OkPacket } from "mysql";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { channel } from "diagnostics_channel";
 
 /*
 개시글 리스트 불러오기 
 todo : page-nation
 */
-function getPostList(request: Request, response: Response): void {
+async function getPostList(
+    request: Request,
+    response: Response
+): Promise<void> {
     const page: number = Number(request.query.page) || 1;
     const limit: number = Number(request.query.limit) || 100;
     console.log(page, limit);
-    pool.query(
-        `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
-    user_require_info.nation as author_nation, user_require_info.user_type as user_type,
-    post.capacity as meeting_capacity, post.picture as meeting_pic,
-    post.location as meeting_location, post.start_time as meeting_start_time
-    from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
-    Limit ${limit} offset ${(page - 1) * limit}`,
-        (err: MysqlError, results: OkPacket) => {
-            if (err) {
-                response.status(400).json({
-                    status: 400,
-                    message: "글 조회 실패",
-                });
-            }
-            response.status(200).json({
-                status: 200,
-                data: results,
-            });
-        }
-    );
+    const query = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity as meeting_capacity, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time 
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
+        Limit ? offset ?`;
+    const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(query, [
+        String(limit),
+        String((page - 1) * limit),
+    ]);
+    response.status(200).json({
+        status: 200,
+        data: rows,
+    });
 }
 
 /*
 개시글 작성
 */
-function createPost(request: Request, response: Response) {
+async function createPost(request: Request, response: Response) {
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
     if (request.headers.authorization == undefined) {
         response.status(400).json({
@@ -69,47 +68,42 @@ function createPost(request: Request, response: Response) {
             picDIRList.push(imageFiles[i].filename);
         }
     }
+    const createQuery =
+        "insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?)";
 
-    pool.query(
-        `Insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values (    
-            "${postBody.title}",
-            "${postBody.content}",
-            '${JSON.stringify(picDIRList)}',
-            "${
-                Number(postBody.capacity_local) +
-                Number(postBody.capacity_travel)
-            }",
-            "${postBody.meeting_location}",
-            "${postBody.meeting_start_time}",
-            "${postBody.user_uniq_id}",
-            "${postBody.category}")`,
-        (err: MysqlError, results: OkPacket) => {
-            // 글쓴이는 바로 채팅방 입장
-            pool.query(
-                `insert into post_participation (post_id, user_uniq_id) values ("${results.insertId}","${postBody.user_uniq_id}")`,
-                (err: MysqlError, results: OkPacket) => {
-                    if (err) {
-                        console.log(err);
-                        response.status(400).json({
-                            status: 400,
-                            message: "글 등록 실패",
-                        });
-                        return;
-                    }
-                }
-            );
-            response.status(200).json({
-                status: 200,
-                post_id: results.insertId,
-            });
-        }
+    const createValues = [
+        postBody.title,
+        postBody.content,
+        JSON.stringify(picDIRList),
+        Number(postBody.capacity_local) + Number(postBody.capacity_travel),
+        postBody.meeting_location,
+        postBody.meeting_start_time,
+        postBody.user_uniq_id,
+        postBody.category,
+    ];
+
+    //에러처리 필요함 1. 글이 등록 실패했을때, 2. 글등록은됐는데 채팅방에 안들어가졌을때.
+    const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
+        createQuery,
+        createValues
     );
+    const post_id = results.insertId;
+    const chatEnterQuery =
+        "insert into post_participation (post_id, user_uniq_id) values (?,?)";
+    await pool.execute(chatEnterQuery, [post_id, postBody.user_uniq_id]);
+    response.status(200).json({
+        status: 200,
+        post_id: post_id,
+    });
 }
 
 /*
 개시글 상세보기
 */
-function getPostDetail(request: Request, response: Response): void {
+async function getPostDetail(
+    request: Request,
+    response: Response
+): Promise<void> {
     const post_id: string = request.params.id;
     const user_uniq_id: any = request.headers.authorization; //todo
     if (request.headers.authorization == undefined) {
@@ -119,39 +113,43 @@ function getPostDetail(request: Request, response: Response): void {
         });
         return;
     }
-    pool.query(
-        `select
-            post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
-            user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
-            post.capacity as meeting_capacity, post.picture as meeting_pic, post.location as meeting_location,
-            post.start_time as meeting_start_time, post.category_id as category,
-            (select count(*) from post_like where post_id = "${post_id}")as like_count,
-            (case when exists (select 1 from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as like_check, 
-            (case when exists (select 1 from post_participation where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}")then 1 else 0 end) as participation_status
-            from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
-            where post_id = "${post_id}"`,
-        (err: MysqlError, results: any) => {
-            if (err) {
-                console.log(err);
-                response.status(400).json({
-                    status: 400,
-                    message: "글 불러오기 실패",
-                });
-                return;
-            }
-            if (results.length == 0) {
-                response.status(400).json({
-                    status: 400,
-                    message: "없는 글입니다.",
-                });
-                return;
-            }
-            response.status(200).json({
-                status: 200,
-                data: results,
+    const query = `select
+    post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
+    user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
+    post.capacity as meeting_capacity, post.picture as meeting_pic, post.location as meeting_location,
+    post.start_time as meeting_start_time, post.category_id as category,
+    (select count(*) from post_like where post_id = :post_id )as like_count,
+    (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
+    (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
+    from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
+    where post_id = :post_id`;
+    //이게맞나?
+    const values = { post_id, user_uniq_id };
+
+    try {
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+
+        if (rows.length == 0) {
+            response.status(400).json({
+                status: 400,
+                message: "없는 글입니다.",
             });
+            return;
         }
-    );
+        response.status(200).json({
+            status: 200,
+            data: rows,
+        });
+    } catch (err) {
+        console.log(err);
+        response.status(400).json({
+            status: 400,
+            message: "글조회 실패",
+        });
+    }
 }
 
 /*개시글 수정 */
@@ -163,48 +161,47 @@ function updatePost(request: Request, response: Response) {
 /*
 개시글 삭제
 */
-function deletePost(request: Request, response: Response) {
+async function deletePost(request: Request, response: Response) {
     // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
     const post_id: string = request.params.id;
-    pool.query(
-        `select user_uniq_id from post where post_id = "${post_id}"`,
-        (err: MysqlError, results: any) => {
-            if (results.length == 0) {
-                response.status(400).json({
-                    status: 400,
-                    message: " 존재하지 않는 글입니다",
-                });
-                return;
-            }
-            if (results[0].user_uniq_id != request.headers.authorization) {
-                response.status(400).json({
-                    status: 400,
-                    message: " 권한이 없습니다.",
-                });
-                return;
-            }
-            pool.query(
-                `Delete from post where post_id = "${post_id}";`,
-                function (err: MysqlError) {
-                    if (err) {
-                        response.status(400).json({
-                            status: 400,
-                            message: "글 삭제 실패",
-                        });
-                        return;
-                    }
-                    response.status(200).json({
-                        status: 200,
-                        message: "글 삭제 성공",
-                    });
-                }
-            );
+    const userSearchQuery: string =
+        "select user_uniq_id from post where post_id = ?";
+    try {
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            userSearchQuery,
+            [post_id]
+        );
+        if (rows.length == 0) {
+            response.status(400).json({
+                status: 400,
+                message: " 존재하지 않는 글입니다",
+            });
+            return;
         }
-    );
+        if (rows[0].user_uniq_id != request.headers.authorization) {
+            response.status(400).json({
+                status: 400,
+                message: " 권한이 없습니다.",
+            });
+            return;
+        }
+        const deleteQuery: string = "Delete from post where post_id = ?";
+        await pool.execute(deleteQuery, [post_id]);
+        response.status(200).json({
+            status: 200,
+            message: "글 삭제 성공",
+        });
+    } catch (err) {
+        console.log(err);
+        response.status(400).json({
+            status: 400,
+            message: "글 삭제 실패",
+        });
+    }
 }
 
 /*좋아요 버튼 눌렀을때의 동작 */
-function pushLike(request: Request, response: Response) {
+async function pushLike(request: Request, response: Response) {
     const post_id: string = request.params.id;
     const user_uniq_id = request.headers.authorization; //todo
     if (request.headers.authorization == undefined) {
@@ -215,54 +212,35 @@ function pushLike(request: Request, response: Response) {
         return;
     }
 
-    const selectQuery: string = `select * from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}"`;
-    const insertQuery: string = `insert into post_like (post_id, user_uniq_id) values ("${post_id}", "${user_uniq_id}")`;
-    const deleteQuery: string = `delete from post_like where post_id = "${post_id}" and user_uniq_id = "${user_uniq_id}"`;
-
-    pool.query(selectQuery, (err: MysqlError, results: any[]) => {
-        if (err) {
-            console.log("mysql err", err);
-            response.status(400).json({
-                status: 400,
-                message: "좋아요 여부 탐색 실패",
-            });
-            return;
-        }
-        // 좋아요 취소
-        if (results.length != 0) {
-            pool.query(deleteQuery, (err: MysqlError) => {
-                if (err) {
-                    console.log("mysql err", err);
-                    response.status(400).json({
-                        status: 400,
-                        message: "좋아요 삭제실패",
-                    });
-                    return;
-                }
-                response.status(200).json({
-                    status: 200,
-                    message: "좋아요 삭제성공",
-                });
-            });
-            return;
-        }
-        //좋아요 등록
-        pool.query(insertQuery, (err: MysqlError) => {
-            if (err) {
-                console.log("mysql err", err);
-                response.status(400).json({
-                    status: 400,
-                    message: "좋아요 등록실패",
-                });
-                return;
-            }
+    const selectQuery: string = `select * from post_like where post_id = ? and user_uniq_id = ?`;
+    const insertQuery: string = `insert into post_like (post_id, user_uniq_id) values (?, ?)`;
+    const deleteQuery: string = `delete from post_like where post_id = ? and user_uniq_id = ?`;
+    const values = [post_id, user_uniq_id];
+    try {
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            selectQuery,
+            values
+        );
+        if (rows.length == 0) {
+            await pool.execute(insertQuery, values);
             response.status(200).json({
                 status: 200,
                 message: "좋아요 등록 성공",
             });
             return;
+        }
+        await pool.execute(deleteQuery, values);
+        response.status(200).json({
+            status: 200,
+            message: "좋아요 삭제성공",
         });
-    });
+    } catch (err) {
+        console.log(err);
+        response.status(400).json({
+            status: 400,
+            message: "좋아요 처리 에러",
+        });
+    }
 }
 
 /*todos
