@@ -10,8 +10,17 @@ interface passportConfig {
         clientID: string;
         callbackURL: string;
     };
-    google: {};
-    line: {};
+    google: {
+        clientID: string;
+        clientSecret: string;
+        callbackURL: string;
+    };
+    line: {
+        channelID: string;
+        channelSecret: string;
+        callbackURL: string;
+        scope: string[];
+    };
 }
 
 const passportConfig: passportConfig = {
@@ -22,8 +31,17 @@ const passportConfig: passportConfig = {
         clientID: process.env.KAKAO_ID || "",
         callbackURL: "/auth/kakao/callback",
     },
-    google: {},
-    line: {},
+    google: {
+        clientID: process.env.GOOGLE_ID || "",
+        clientSecret: process.env.GOOGLE_SECRET || "",
+        callbackURL: "/auth/google/callback",
+    },
+    line: {
+        channelID: process.env.LINE_ID || "",
+        channelSecret: process.env.LINE_SECRET || "",
+        callbackURL: "/auth/line/callback",
+        scope: ["profile", "openid"],
+    },
 };
 
 export { passportConfig };

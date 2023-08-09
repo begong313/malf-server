@@ -1,35 +1,30 @@
 import passport from "passport";
-import { Strategy } from "passport-kakao";
+import { Strategy } from "passport-google-oauth20";
 import { passportConfig } from "../config/passport_config";
-
+import { FieldPacket, RowDataPacket } from "mysql2";
 import pool from "../lib/dbConnector";
 import jwtGenerate from "../lib/jwtGenerator";
-import { QueryError } from "mysql2";
 
-function kakao() {
+function google() {
     passport.use(
         new Strategy(
-            passportConfig.kakao,
-            async (
-                accessToken: any,
-                refreshToken: any,
-                profile: any,
-                done: any
-            ) => {
-                let user_uniq_id;
+            passportConfig.google,
+            async (accessToken, refreshToken, profile, cb) => {
+                let user_uniq_id: string;
                 const searchQuery =
-                    "select user_uniq_id from kakao_account where kakaoID = ?";
+                    "select user_uniq_id from google_account where googleID = ?";
                 const values = [profile.id];
+                const [rows]: [RowDataPacket[], FieldPacket[]] =
+                    await pool.execute(searchQuery, values);
 
-                /* 첫 가입인지 확인 후 계정없으면 생성 */
-                const [rows]: any = await pool.execute(searchQuery, values);
                 if (rows.length == 0) {
                     console.log("Id값이 없읍니다.");
-                    user_uniq_id = "k_" + profile.id;
+                    user_uniq_id = "g_" + profile.id;
+                    console.log(user_uniq_id);
                     const insertAQuery =
-                        "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'kakao','123456')";
+                        "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'google','1234356')";
                     const instertBQuery =
-                        "insert into kakao_account (user_uniq_id, kakaoID) values (?,?)";
+                        "insert into google_account (user_uniq_id, googleID) values (?,?)";
                     await pool.execute(insertAQuery, [user_uniq_id]);
                     await pool.execute(instertBQuery, [
                         user_uniq_id,
@@ -39,13 +34,11 @@ function kakao() {
                 } else {
                     user_uniq_id = rows[0].user_uniq_id;
                 }
-                //Jwt생성
-
                 const jwtToken = jwtGenerate(user_uniq_id);
-                return done(null, jwtToken);
+                return cb(null, jwtToken);
             }
         )
     );
 }
 
-export default kakao;
+export default google;

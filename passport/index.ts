@@ -3,20 +3,15 @@
 import passport from "passport";
 import kakao from "./kakaoStrategy";
 import local from "./localStrategy";
+import google from "./googleStrategy";
+// import line from "./lineStrategy";
 
 function passportInit() {
-    passport.serializeUser((user, done) => {
-        console.log(user);
-        done(null, user);
-    });
-
-    passport.deserializeUser<any, any>((user, done) => {
-        // 세션으로부터 사용자 정보를 복원합니다.
-        console.log(user);
-        done(null, user);
-    });
+    passport.initialize();
     kakao();
     local();
+    google();
+    //line();
 }
 
 export default passportInit;

@@ -9,6 +9,11 @@ function kakaoCallback(request: Request, response: Response) {
     response.status(200).json({ status: 200, token: jwtToken });
 }
 
+function googleCallback(request: Request, response: Response) {
+    const jwtToken = request.user;
+    response.status(200).json({ status: 200, token: jwtToken });
+}
+
 async function localJoin(request: Request, response: Response) {
     console.log(request.body);
     const userEmail = request.body.user_email; // 이거 뭘로할지 정해야됨.
@@ -56,4 +61,10 @@ function loginError(request: Request, response: Response) {
     });
 }
 
-export { kakaoCallback, localJoin, localLoginCallback, loginError };
+export {
+    kakaoCallback,
+    googleCallback,
+    localJoin,
+    localLoginCallback,
+    loginError,
+};
