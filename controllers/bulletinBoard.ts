@@ -35,10 +35,32 @@ async function getPostList(
     });
 }
 
+async function testfunction(request: Request, response: Response) {
+    const createQuery = "insert into test (id, test) values (?,?)";
+    const createValues = [1, { pic: ["aaa", "aaa", "aaa"] }];
+    //에러처리 필요함 1. 글이 등록 실패했을때, 2. 글등록은됐는데 채팅방에 안들어가졌을때.
+    const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
+        createQuery,
+        createValues
+    );
+
+    response.status(200).json({
+        status: 200,
+    });
+}
+async function gettestfunction(request: Request, response: Response) {
+    const query = "select * from test ";
+    const [results] = await pool.execute(query);
+    response.status(200).json({
+        status: 200,
+        data: results,
+    });
+}
 /*
 개시글 작성
 */
 async function createPost(request: Request, response: Response) {
+    console.log(request);
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
     if (request.headers.authorization == undefined) {
         response.status(400).json({
@@ -131,6 +153,7 @@ async function getPostDetail(
             query,
             values
         );
+        // rows[0].author_picture = JSON.parse(rows[0].author_picture);
 
         if (rows.length == 0) {
             response.status(400).json({
@@ -254,4 +277,6 @@ export {
     updatePost,
     deletePost,
     pushLike,
+    testfunction,
+    gettestfunction,
 };
