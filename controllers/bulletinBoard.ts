@@ -60,7 +60,7 @@ async function gettestfunction(request: Request, response: Response) {
 개시글 작성
 */
 async function createPost(request: Request, response: Response) {
-    console.log(request);
+    console.log(request.body);
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
     if (request.headers.authorization == undefined) {
         response.status(400).json({
