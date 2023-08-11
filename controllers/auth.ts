@@ -49,7 +49,7 @@ async function lineCallback(request: Request, response: Response) {
     const dataTosend = {
         grant_type: "authorization_code",
         code: code,
-        redirect_uri: `${server_url}/auth/line/callback`,
+        redirect_uri: `${server_url}auth/line/callback`,
         client_id: process.env.LINE_ID,
         client_secret: process.env.LINE_SECRET,
     };
