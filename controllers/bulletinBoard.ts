@@ -4,9 +4,7 @@ bulletinBoard controller
 
 import { Request, Response } from "express";
 import pool from "../lib/dbConnector";
-import { MysqlError, OkPacket } from "mysql";
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
-import { channel } from "diagnostics_channel";
 
 /*
 개시글 리스트 불러오기 
@@ -35,27 +33,6 @@ async function getPostList(
     });
 }
 
-async function testfunction(request: Request, response: Response) {
-    const createQuery = "insert into test (id, test) values (?,?)";
-    const createValues = [1, { pic: ["aaa", "aaa", "aaa"] }];
-    //에러처리 필요함 1. 글이 등록 실패했을때, 2. 글등록은됐는데 채팅방에 안들어가졌을때.
-    const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-        createQuery,
-        createValues
-    );
-
-    response.status(200).json({
-        status: 200,
-    });
-}
-async function gettestfunction(request: Request, response: Response) {
-    const query = "select * from test ";
-    const [results] = await pool.execute(query);
-    response.status(200).json({
-        status: 200,
-        data: results,
-    });
-}
 /*
 개시글 작성
 */
@@ -83,7 +60,7 @@ async function createPost(request: Request, response: Response) {
     const imageFiles: any = request.files;
     var picDIRList: string[] = []; //사진 경로 담을 array
     //첨부사진이 없을 때
-    if (imageFiles == undefined) {
+    if (imageFiles == 0) {
         picDIRList.push("default.jpeg");
     } else {
         //사진 dir정보
@@ -146,7 +123,7 @@ async function getPostDetail(
     (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
     from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
     where post_id = :post_id`;
-    //이게맞나?
+
     const values = { post_id, user_uniq_id };
 
     try {
@@ -188,6 +165,13 @@ function updatePost(request: Request, response: Response) {
 async function deletePost(request: Request, response: Response) {
     // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
     const post_id: string = request.params.id;
+    if (request.headers.authorization == undefined) {
+        response.status(400).json({
+            status: 400,
+            message: "사용자 정보가 없습니다",
+        });
+        return;
+    }
     const userSearchQuery: string =
         "select user_uniq_id from post where post_id = ?";
     try {
@@ -278,6 +262,4 @@ export {
     updatePost,
     deletePost,
     pushLike,
-    testfunction,
-    gettestfunction,
 };

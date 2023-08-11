@@ -1,17 +1,12 @@
 import express, { Router, Response, Request } from "express";
 import upload from "../lib/multerCustom";
-import { firstSetInfo } from "../controllers/user";
+import { firstSetInfo } from "../controllers/userInfo";
 import { verifyToken } from "./middlwares";
 import pool from "../lib/dbConnector";
 
 const router: Router = express.Router();
 
-router.post(
-    "/first-set-info",
-    verifyToken,
-    upload.array("image", 10),
-    firstSetInfo
-); // 첫 실행시 유저정보 등록창
+router.post("/first-set-info", upload.array("image", 1), firstSetInfo); // 첫 실행시 유저정보 등록창
 
 router.get("/test", verifyToken, (req, res) => {
     console.log(res.locals.decoded);

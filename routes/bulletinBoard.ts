@@ -7,8 +7,6 @@ import {
     updatePost,
     deletePost,
     pushLike,
-    testfunction,
-    gettestfunction,
 } from "../controllers/bulletinBoard";
 
 import { verifyToken } from "./middlwares";
@@ -26,7 +24,5 @@ router.delete("/posts/:id", deletePost); //글 삭제
 
 router.post("/posts/:id/like", pushLike); //좋아요 클릭
 
-router.post("/test", testfunction);
-router.get("/test", gettestfunction);
 //todo : api문서 주소 업데이트. 모두 Posts로 주소를 바꿨음.
 export default router;

@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 
 //Router Setting
 app.use("/auth", authRtouer); //회원가입
-app.use("/user", userRouter);
+app.use("/userinfo", userRouter);
 app.use("/bulletin-board", bulletinboardRouter);
 app.use("/chatroom", chatRouter);
 app.use("/ad", adRouter);

@@ -1,12 +1,9 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
-import { passportConfig } from "../config/passport_config";
 
 import pool from "../lib/dbConnector";
 import jwtGenerate from "../lib/jwtGenerator";
 import bcrypt from "bcrypt";
-import { QueryError } from "mysql2";
-import { error } from "console";
 
 function local() {
     passport.use(

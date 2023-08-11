@@ -27,7 +27,7 @@ function kakao() {
                     console.log("Id값이 없읍니다.");
                     user_uniq_id = "k_" + profile.id;
                     const insertAQuery =
-                        "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'kakao','123456')";
+                        "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'kakao','12222223456')";
                     const instertBQuery =
                         "insert into kakao_account (user_uniq_id, kakaoID) values (?,?)";
                     await pool.execute(insertAQuery, [user_uniq_id]);
