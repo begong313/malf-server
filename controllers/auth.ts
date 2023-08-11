@@ -18,13 +18,13 @@ function googleCallback(request: Request, response: Response) {
 
 function lineRedirect(request: Request, response: Response) {
     const client_id: string = process.env.LINE_ID!;
-    let server_url: string = "http://localhost:8000";
+    let server_url: string = "http://localhost:8000/";
     if (process.env.NODE_ENV) {
         //나중에 test일때도 추가해야함
         server_url = process.env.MALF_SERVER_URL!;
     }
     const state: string = shortid.generate();
-    const lineAuthURL: string = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}/auth/line/callback&state=${state}&scope=profile%20openid%20email`;
+    const lineAuthURL: string = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}auth/line/callback&state=${state}&scope=profile%20openid%20email`;
     response.redirect(lineAuthURL);
 }
 
