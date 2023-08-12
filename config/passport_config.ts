@@ -15,6 +15,10 @@ interface passportConfig {
         clientSecret: string;
         callbackURL: string;
     };
+    setting: {
+        session: boolean;
+        failureRedirect: string;
+    };
 }
 
 const passportConfig: passportConfig = {
@@ -29,6 +33,10 @@ const passportConfig: passportConfig = {
         clientID: process.env.GOOGLE_ID || "",
         clientSecret: process.env.GOOGLE_SECRET || "",
         callbackURL: "/auth/google/callback",
+    },
+    setting: {
+        session: false,
+        failureRedirect: "/auth/login-error",
     },
 };
 

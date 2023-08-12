@@ -46,6 +46,7 @@
     "description": "",
     "devDependencies": {
         "@types/bcrypt": "^5.0.0",
+        "@types/connect-flash": "^0.0.37",
         "@types/cookie-session": "^2.0.44",
         "@types/express-session": "^1.17.7",
         "@types/jsonwebtoken": "^9.0.2",

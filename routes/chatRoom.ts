@@ -1,5 +1,4 @@
 import { Router } from "express";
-import upload from "../lib/multerCustom";
 import {
     wantJoinChatroom,
     cancelJoinChatroom,
@@ -10,11 +9,11 @@ import {
     getChatMembers,
 } from "../controllers/chatRoom";
 
-import { verifyToken } from "./middlwares";
+import { verifyToken } from "../lib/middlwares";
 
 const router: Router = Router();
 
-// router.use(verifyToken); //현재 test를 위해 비활성화 해놓은 상태 app.ts로 빼도 되지 않을까? 어짜피 매번 로그인되어있나 검사할건데
+router.use(verifyToken);
 
 router.post("/:id/subscribe", wantJoinChatroom); //채팅방 입장 신청
 router.delete("/:id/subscribe", cancelJoinChatroom); //입장 신청 취소(철회)

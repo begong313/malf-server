@@ -9,11 +9,11 @@ import {
     pushLike,
 } from "../controllers/bulletinBoard";
 
-import { verifyToken } from "./middlwares";
+import { verifyToken } from "../lib/middlwares";
 
 const router: Router = Router();
 
-// router.use(verifyToken); //현재 test를 위해 비활성화 해놓은 상태
+router.use(verifyToken); //현재 test를 위해 비활성화 해놓은 상태
 
 router.get("/posts", getPostList); //홈화면 글 리스트 불러오기
 router.post("/posts", upload.array("image", 10), createPost); //글작성, 사진 최대 개수 10개

@@ -4,25 +4,15 @@ import bcrypt from "bcrypt";
 import shortid from "shortid";
 import axios from "axios";
 import jwtGenerate from "../lib/jwtGenerator";
+import { getUserUniqId, searchUserID, signUP } from "../passport/lib";
+import { RowDataPacket } from "mysql2";
+import getServerUrl from "../lib/getServerURL";
 
-/* 카카오 요청 응답 받은 후 추후 동작 */
-function kakaoCallback(request: Request, response: Response) {
-    const jwtToken = request.user;
-    response.status(200).json({ status: 200, token: jwtToken });
-}
-
-function googleCallback(request: Request, response: Response) {
-    const jwtToken = request.user;
-    response.status(200).json({ status: 200, token: jwtToken });
-}
-
+/* 라인 소셜로그인 Redirect url*/
 function lineRedirect(request: Request, response: Response) {
     const client_id: string = process.env.LINE_ID!;
-    let server_url: string = "http://localhost:8000/";
-    if (process.env.NODE_ENV) {
-        //나중에 test일때도 추가해야함
-        server_url = process.env.MALF_SERVER_URL!;
-    }
+
+    const server_url: string = getServerUrl();
     const state: string = shortid.generate();
     const lineAuthURL: string = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}auth/line/callback&state=${state}&scope=profile%20openid%20email`;
     response.redirect(lineAuthURL);
@@ -34,13 +24,10 @@ async function lineCallback(request: Request, response: Response) {
         response.redirect("auth/login-error");
         return;
     }
+
     // const state: string = request.query.state as string;
     const code: string = request.query.code as string;
-    let server_url: string = "http://localhost:8000";
-    if (process.env.NODE_ENV) {
-        //나중에 test일때도 추가해야함
-        server_url = process.env.MALF_SERVER_URL!;
-    }
+    const server_url: string = getServerUrl();
 
     // access token 받아오기
     var headers = {
@@ -54,6 +41,7 @@ async function lineCallback(request: Request, response: Response) {
         client_secret: process.env.LINE_SECRET,
     };
     const tokenRequestUrl = "https://api.line.me/oauth2/v2.1/token";
+
     const apiresponse = await axios.post(tokenRequestUrl, dataTosend, {
         headers,
     });
@@ -66,30 +54,12 @@ async function lineCallback(request: Request, response: Response) {
     const userdata = await axios.get("https://api.line.me/v2/profile", {
         headers,
     });
-    console.log(userdata.data);
-    console.log([...userdata.data.userId].length);
 
-    //로그인 , 회원가입 프로세스
-    let user_uniq_id;
-    const searchQuery =
-        "select user_uniq_id from line_account where lineID = ?";
-    const values = [userdata.data.userId];
+    const user_uniq_id: string = await getUserUniqId(
+        "line",
+        userdata.data.userId
+    );
 
-    /* 첫 가입인지 확인 후 계정없으면 생성 */
-    const [rows]: any = await pool.execute(searchQuery, values);
-    if (rows.length == 0) {
-        console.log("Id값이 없읍니다.");
-        user_uniq_id = "L_" + userdata.data.userId;
-        const insertAQuery =
-            "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'kakao','12222223456')";
-        const instertBQuery =
-            "insert into line_account (user_uniq_id, lineID) values (?,?)";
-        await pool.execute(insertAQuery, [user_uniq_id]);
-        await pool.execute(instertBQuery, [user_uniq_id, userdata.data.userId]);
-        console.log("회원가입성공");
-    } else {
-        user_uniq_id = rows[0].user_uniq_id;
-    }
     //Jwt생성
     const jwtToken = jwtGenerate(user_uniq_id);
     response.status(200).json({ status: 200, token: jwtToken });
@@ -100,13 +70,11 @@ async function localJoin(request: Request, response: Response) {
     console.log(request.body);
     const userEmail = request.body.email; // 로그인 시 Id 로 쓸 이메일, 중복체크 해야함
     const password = request.body.password;
-    const phone_number = request.body.phone_number;
 
-    const searchQuery =
-        "select user_uniq_id from local_account where email = ?";
+    // const phone_number = request.body.phone_number;
 
     //이메일이 이미 있으면
-    const [rows]: any = await pool.execute(searchQuery, [userEmail]);
+    const rows: RowDataPacket[] = await searchUserID("local", userEmail);
     if (rows.length != 0) {
         response.status(400).json({
             status: 400,
@@ -114,18 +82,11 @@ async function localJoin(request: Request, response: Response) {
         });
         return;
     }
-    const user_uniq_id = "lo_" + userEmail();
 
-    //이부분이 쫌 오래걸리는듯
     try {
+        //이부분이 쫌 오래걸리는듯
         const hashedPWD = await bcrypt.hash(password, 16);
-        const insertAQuery =
-            "insert into user_id (user_uniq_id, account_type, phone_number) values (?,'local',?)";
-        const instertBQuery =
-            "insert into local_account (user_uniq_id, password,email) values (?,?,?)";
-
-        await pool.execute(insertAQuery, [user_uniq_id, phone_number]);
-        await pool.execute(instertBQuery, [user_uniq_id, hashedPWD, userEmail]);
+        await signUP("local", userEmail, hashedPWD);
     } catch (err) {
         console.log(err);
         response.status(200).json({
@@ -140,25 +101,28 @@ async function localJoin(request: Request, response: Response) {
         message: "회원가입 성공",
     });
 }
-function localLoginCallback(request: Request, response: Response) {
+// 로그인 성공하면 토큰발급
+function loginCallback(request: Request, response: Response) {
     const jwtToken = request.user;
+    console.log(jwtToken);
     response.status(200).json({ status: 200, token: jwtToken });
 }
 
 function loginError(request: Request, response: Response) {
     console.log("로그인 실패");
+
+    if (request.query.error) {
+        response.status(400).json({
+            status: 400,
+            message: "로그인 실패, " + request.query.error,
+        });
+        return;
+    }
     response.status(400).json({
         status: 400,
         message: "로그인 실패",
     });
 }
 
-export {
-    kakaoCallback,
-    googleCallback,
-    localJoin,
-    localLoginCallback,
-    loginError,
-    lineRedirect,
-    lineCallback,
-};
+// todo 굳이 response.status(400)을 하고 또 status를 넣을필요가 없다? 아니면 http Response code와 우리만의 Response code를 분리하자?
+export { loginCallback, localJoin, loginError, lineRedirect, lineCallback };

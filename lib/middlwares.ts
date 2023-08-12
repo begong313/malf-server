@@ -3,13 +3,19 @@ import { passportConfig } from "../config/passport_config";
 
 function verifyToken(request: any, response: any, next: any) {
     try {
-        console.log(request.authorization);
+        console.log(request.headers.authorization);
         response.locals.decoded = jwt.verify(
             request.headers.authorization,
             passportConfig.jwt.secretKey
         );
         return next();
     } catch (error: any) {
+        if (request.headers.authorization == undefined) {
+            return response.status(419).json({
+                code: 418,
+                message: "로그인이 필요합니다.",
+            });
+        }
         if (error.name === "TokenExpiredError") {
             // 유효기간 초과
             return response.status(419).json({

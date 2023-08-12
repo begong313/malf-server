@@ -9,14 +9,8 @@ todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
 */
 async function wantJoinChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
+
     const query: string = `insert into post_want_join (post_id, user_uniq_id) values (?,?)`;
     const values: any[] = [post_id, user_uniq_id];
     try {
@@ -41,14 +35,8 @@ Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lo
 */
 async function cancelJoinChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
+
     const query: string = `delete from post_want_join where post_id = ? and user_uniq_id = ? `;
     const values = [post_id, user_uniq_id];
     try {
@@ -80,14 +68,8 @@ todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을
 */
 async function getEnterRequestChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
+
     try {
         const query: string = `select * from post_want_join join user_require_info on post_want_join.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
         const values: string[] = [post_id];
@@ -115,14 +97,8 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
 */
 async function agreeEnterChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
+
     const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디
     const insertQuery: string = `insert into post_participation (post_id, user_uniq_id) values (?,?)`;
     const deleteQuery: string = `delete from post_want_join where post_id = ? and user_uniq_id = ?`;
@@ -151,7 +127,7 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
 */
 async function disagreeEnterChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
     if (request.headers.authorization == undefined) {
         response.status(400).json({
             status: 400,
@@ -182,14 +158,8 @@ async function disagreeEnterChatroom(request: Request, response: Response) {
 /* 채팅방 나가기*/
 async function leaveChatroom(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
+
     const query: string = `delete from post_participation where post_id = ? and user_uniq_id = ? `;
     const values = [post_id, user_uniq_id];
     try {

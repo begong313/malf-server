@@ -37,16 +37,10 @@ async function getPostList(
 개시글 작성
 */
 async function createPost(request: Request, response: Response) {
-    console.log(request.body);
-    console.log(request.headers.authorization);
+    // console.log(request.body);
+    // console.log(response.locals.decoded.user_uniq_id);
     //todo : 전처리 추가해야 함, 사용자 uniq_id가져와서 글 써야함, category설정 필요
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+
     const postBody = {
         title: request.body.title,
         content: request.body.content,
@@ -54,7 +48,7 @@ async function createPost(request: Request, response: Response) {
         capacity_travel: request.body.capacity_travel,
         meeting_location: request.body.meeting_location,
         meeting_start_time: request.body.meeting_start_time,
-        user_uniq_id: request.headers.authorization, //test용 코드. 추후 header에서 값 추출 필요
+        user_uniq_id: response.locals.decoded.user_uniq_id,
         category: request.body.category, // 카테고리는 미완성임
     };
     const imageFiles: any = request.files;
@@ -105,7 +99,7 @@ async function getPostDetail(
     response: Response
 ): Promise<void> {
     const post_id: string = request.params.id;
-    const user_uniq_id: any = request.headers.authorization; //todo
+    const user_uniq_id: any = response.locals.decoded.user_uniq_id;
     if (request.headers.authorization == undefined) {
         response.status(400).json({
             status: 400,
@@ -165,13 +159,7 @@ function updatePost(request: Request, response: Response) {
 async function deletePost(request: Request, response: Response) {
     // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
     const post_id: string = request.params.id;
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+
     const userSearchQuery: string =
         "select user_uniq_id from post where post_id = ?";
     try {
@@ -186,7 +174,7 @@ async function deletePost(request: Request, response: Response) {
             });
             return;
         }
-        if (rows[0].user_uniq_id != request.headers.authorization) {
+        if (rows[0].user_uniq_id != response.locals.decoded.user_uniq_id) {
             response.status(400).json({
                 status: 400,
                 message: " 권한이 없습니다.",
@@ -211,14 +199,7 @@ async function deletePost(request: Request, response: Response) {
 /*좋아요 버튼 눌렀을때의 동작 */
 async function pushLike(request: Request, response: Response) {
     const post_id: string = request.params.id;
-    const user_uniq_id = request.headers.authorization; //todo
-    if (request.headers.authorization == undefined) {
-        response.status(400).json({
-            status: 400,
-            message: "사용자 정보가 없습니다",
-        });
-        return;
-    }
+    const user_uniq_id = response.locals.decoded.user_uniq_id;
 
     const selectQuery: string = `select * from post_like where post_id = ? and user_uniq_id = ?`;
     const insertQuery: string = `insert into post_like (post_id, user_uniq_id) values (?, ?)`;
