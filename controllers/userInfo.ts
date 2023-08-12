@@ -71,6 +71,8 @@ async function firstSetInfo(request: Request, response: Response) {
         response.status(200).json({
             status: 200,
             message: "회원 정보 등록 성공",
+            requireInfo: requiredInfo,
+            additionalInfo: additionalInfo,
         });
     } catch (err) {
         console.log(err);
