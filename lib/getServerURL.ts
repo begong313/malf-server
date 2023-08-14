@@ -6,7 +6,7 @@ function getServerUrl(): string {
         case "production":
             server_url = process.env.MALF_SERVER_URL!;
         default:
-            server_url = "http://localhost:8000/";
+            server_url = "http://localhost:8000";
     }
     return server_url;
 }

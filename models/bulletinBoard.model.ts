@@ -1,0 +1,114 @@
+/* 작성필요 */
+
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import pool from "../lib/dbConnector";
+import { Service } from "typedi";
+
+@Service()
+export class BulletinBoardModel {
+    public async loadPostList(
+        page: number,
+        limit: number
+    ): Promise<RowDataPacket[]> {
+        const query: string = this.getLoadPostListQuery();
+        const values = [String(limit), String((page - 1) * limit)];
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    }
+    private getLoadPostListQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity as meeting_capacity, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time 
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
+        Limit ? offset ?`;
+        return query;
+    }
+
+    public async createPost(postBody: any): Promise<number> {
+        const query: string = this.getCreateQuery();
+        const values = [
+            postBody.title,
+            postBody.content,
+            postBody.picDIRList,
+            Number(postBody.capacity_local) + Number(postBody.capacity_travel),
+            postBody.meeting_location,
+            postBody.meeting_start_time,
+            postBody.user_uniq_id,
+            postBody.category,
+        ];
+        //에러처리 필요함 1. 글이 등록 실패했을때, 2. 글등록은됐는데 채팅방에 안들어가졌을때.
+        const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        const post_id: number = results.insertId;
+
+        //나중에 chat부분으로 따로 빼야됨~~~~
+        const chatEnterQuery =
+            "insert into post_participation (post_id, user_uniq_id) values (?,?)";
+        await pool.execute(chatEnterQuery, [post_id, postBody.user_uniq_id]);
+        ////
+
+        return post_id;
+    }
+
+    private getCreateQuery(): string {
+        const query: string =
+            "insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?)";
+        return query;
+    }
+
+    public async loadPostDetail(
+        post_id: string,
+        user_uniq_id: string
+    ): Promise<RowDataPacket[]> {
+        const query: string = this.getLoadPostDetailQuery();
+        const values = { post_id, user_uniq_id };
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    }
+    private getLoadPostDetailQuery(): string {
+        const query: string = `select
+        post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
+        user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
+        post.capacity as meeting_capacity, post.picture as meeting_pic, post.location as meeting_location,
+        post.start_time as meeting_start_time, post.category_id as category,
+        (select count(*) from post_like where post_id = :post_id )as like_count,
+        (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
+        (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
+        from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
+        where post_id = :post_id`;
+        return query;
+    }
+
+    public async userIDSearch(post_id: string): Promise<RowDataPacket[]> {
+        const query: string = this.getUserIDSearchQuery();
+        const values = [post_id];
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    }
+    private getUserIDSearchQuery() {
+        const query: string = "select user_uniq_id from post where post_id = ?";
+        return query;
+    }
+
+    public async deletePost(post_id: string) {
+        const query = this.getDeleteQuery();
+        const values = [post_id];
+        await pool.execute(query, values);
+    }
+    private getDeleteQuery() {
+        const query: string = "Delete from post where post_id = ?";
+        return query;
+    }
+}

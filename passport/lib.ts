@@ -40,15 +40,15 @@ async function signUP(
 
     const user_uniq_id: string = prefix + profile_ID;
     //휴대폰 버놓 부분은 따로 분리해야 함
-    const insertAQuery = `insert into user_id (user_uniq_id, account_type, phone_number) values (?,${platform},'12222223456')`;
-    await pool.execute(insertAQuery, [user_uniq_id]);
+    const insertAQuery = `insert into user_id (user_uniq_id, account_type, phone_number) values (?,?,'12222223456')`;
+    await pool.execute(insertAQuery, [user_uniq_id, platform]);
 
     let insertBQuery;
     let values;
     if (platform == "local") {
         insertBQuery =
             "insert into local_account (user_uniq_id, password,localID) values (?,?,?)";
-        values = [user_uniq_id, profile_ID, password];
+        values = [user_uniq_id, password, profile_ID];
     } else {
         insertBQuery = `insert into ${platform}_account (user_uniq_id, ${platform}ID) values (?,?)`;
         values = [user_uniq_id, profile_ID];

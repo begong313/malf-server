@@ -1,38 +1,18 @@
-import express, { Express } from "express";
-import authRtouer from "./routes/auth";
-import passportInit from "./passport";
-import userRouter from "./routes/userInfo";
-import bulletinboardRouter from "./routes/bulletinBoard";
-import chatRouter from "./routes/chatRoom";
-import picRouter from "./routes/picture";
-import adRouter from "./routes/ad";
-import cors from "cors";
+import { AdRoute } from "./routes/ad.route";
+import { AuthRoute } from "./routes/auth.route";
+import { BulletinBoardRouter } from "./routes/bulletinBoard.route";
+import { ChatRoomRouter } from "./routes/chatRoom.route";
+import { PictureRouter } from "./routes/picture.route";
+import { UserInfoRouter } from "./routes/userInfo.route";
+import { Server } from "./Server";
 
-const app: Express = express();
+const app = new Server([
+    new AdRoute(),
+    new AuthRoute(),
 
-app.set("port", process.env.PORT || 8000);
-
-//cors origin error 대비
-app.use(cors());
-app.use(express.json());
-
-// 회원가입 정책 init
-passportInit();
-
-// app.use("/favicon.ico", (req, res, next) => {
-//     // 파비콘 요청에 대해 404 Not Found 응답을 보냅니다.
-//     res.status(404).end();
-// });
-
-//Router Setting
-app.use("/auth", authRtouer); //회원가입
-app.use("/userinfo", userRouter);
-app.use("/bulletin-board", bulletinboardRouter);
-app.use("/chatroom", chatRouter);
-app.use("/ad", adRouter);
-app.use("/", picRouter);
-
-app.listen(app.get("port"), () => {
-    console.log(process.env.NODE_ENV, "에서 동작중");
-    console.log("8000번에서 동작중 ");
-});
+    new BulletinBoardRouter(),
+    new ChatRoomRouter(),
+    new PictureRouter(),
+    new UserInfoRouter(),
+]);
+app.listen();
