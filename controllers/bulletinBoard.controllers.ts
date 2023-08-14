@@ -6,19 +6,24 @@ import { NextFunction, Request, Response } from "express";
 import pool from "../lib/dbConnector";
 import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
-import { BulletinBoardModel } from "../models/bulletinBoard.model";
+import BulletinBoardModel from "../models/bulletinBoard.model";
 import { Container } from "typedi";
 
 export class BulletinBoardController {
     public bulletinBoard = Container.get(BulletinBoardModel);
-    public async loadPostList(
+
+    // public bulletinBoard;;
+
+    public loadPostList = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ): Promise<void> {
+    ): Promise<void> => {
+        console.log(this.bulletinBoard);
         const page: number = Number(request.query.page) || 1;
         const limit: number = Number(request.query.limit) || 100;
 
+        console.log(await this.bulletinBoard.loadPostList(page, limit));
         const rows: RowDataPacket[] = await this.bulletinBoard.loadPostList(
             page,
             limit
@@ -28,16 +33,16 @@ export class BulletinBoardController {
             status: 200,
             data: rows,
         });
-    }
+    };
 
     /*
     개시글 작성
     */
-    public async createPost(
+    public createPost = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         //todo : 전처리 추가해야 함
 
         const imageFiles: any = request.files;
@@ -69,16 +74,16 @@ export class BulletinBoardController {
             status: 200,
             post_id: post_id,
         });
-    }
+    };
 
     /*
     개시글 상세보기
     */
-    public async loadPostDetail(
+    public loadPostDetail = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ): Promise<void> {
+    ): Promise<void> => {
         const post_id: string = request.params.id;
         const user_uniq_id: any = response.locals.decoded;
 
@@ -98,25 +103,25 @@ export class BulletinBoardController {
         } catch (err) {
             next(new HttpException(400, "글 조회 실패"));
         }
-    }
+    };
 
     /*개시글 수정 */
-    public updatePost(
+    public updatePost = (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         /*todo*/
-    }
+    };
 
     /*
     개시글 삭제
     */
-    public async deletePost(
+    public deletePost = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
         const post_id: string = request.params.id;
         const user_uniq_id: string = response.locals.decoded;
@@ -140,14 +145,14 @@ export class BulletinBoardController {
         } catch (err) {
             next(new HttpException(400, "글 삭제 실패"));
         }
-    }
+    };
 
     /*좋아요 버튼 눌렀을때의 동작 */
-    public async pushLike(
+    public pushLike = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
 
@@ -176,7 +181,7 @@ export class BulletinBoardController {
         } catch (err) {
             next(new HttpException(400, "좋아요 처리 에러"));
         }
-    }
+    };
 
     /*todos
     1. 주석

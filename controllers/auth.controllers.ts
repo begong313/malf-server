@@ -12,23 +12,23 @@ import { HttpException } from "../exeptions/HttpException";
 export class AuthController {
     public lineUrl: string = "https://access.line.me";
 
-    public lineRedirect(
+    public lineRedirect = (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         const client_id: string = process.env.LINE_ID!;
         const server_url: string = getServerUrl();
         const state: string = shortid.generate();
         const lineAuthURL: string = `${this.lineUrl}/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}/auth/line/callback&state=${state}&scope=profile%20openid%20email`;
         response.redirect(lineAuthURL);
-    }
+    };
 
-    public async lineCallback(
+    public lineCallback = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         if (request.query.error) {
             console.log(request.query.error);
             response.redirect("auth/login-error");
@@ -73,14 +73,14 @@ export class AuthController {
         //Jwt생성
         const jwtToken = jwtGenerate(user_uniq_id);
         response.status(200).json({ status: 200, token: jwtToken });
-    }
+    };
 
     /*로컬 회원가입 */
-    public async localJoin(
+    public localJoin = async (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         console.log(request.body);
         const userEmail = request.body.email; // 로그인 시 Id 로 쓸 이메일, 중복체크 해야함
         const password = request.body.password;
@@ -107,27 +107,27 @@ export class AuthController {
             status: 200,
             message: "회원가입 성공",
         });
-    }
+    };
     // 로그인 성공하면 토큰발급
-    public loginCallback(
+    public loginCallback = (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         const jwtToken = request.user;
         console.log(jwtToken);
         response.status(200).json({ status: 200, token: jwtToken });
-    }
+    };
 
-    public loginError(
+    public loginError = (
         request: Request,
         response: Response,
         next: NextFunction
-    ) {
+    ) => {
         if (request.query.error) {
             next(new HttpException(400, "로그인 실패, " + request.query.error));
             return;
         }
         next(new HttpException(400, "로그인 실패 "));
-    }
+    };
 }

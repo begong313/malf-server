@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import pool from "../lib/dbConnector";
 
 export class UserInfoController {
-    public async firstSetInfo(request: Request, response: Response) {
+    public firstSetInfo = async (request: Request, response: Response) => {
         if (request.headers.authorization == undefined) {
             response.status(400).json({
                 status: 400,
@@ -82,5 +82,5 @@ export class UserInfoController {
                 message: "회원정보 등록 실패",
             });
         }
-    }
+    };
 }

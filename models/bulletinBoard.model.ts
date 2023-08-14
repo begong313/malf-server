@@ -5,11 +5,11 @@ import pool from "../lib/dbConnector";
 import { Service } from "typedi";
 
 @Service()
-export class BulletinBoardModel {
-    public async loadPostList(
+class BulletinBoardModel {
+    public loadPostList = async (
         page: number,
         limit: number
-    ): Promise<RowDataPacket[]> {
+    ): Promise<RowDataPacket[]> => {
         const query: string = this.getLoadPostListQuery();
         const values = [String(limit), String((page - 1) * limit)];
         const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
@@ -17,7 +17,7 @@ export class BulletinBoardModel {
             values
         );
         return rows;
-    }
+    };
     private getLoadPostListQuery(): string {
         const query: string = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
@@ -28,7 +28,7 @@ export class BulletinBoardModel {
         return query;
     }
 
-    public async createPost(postBody: any): Promise<number> {
+    public createPost = async (postBody: any): Promise<number> => {
         const query: string = this.getCreateQuery();
         const values = [
             postBody.title,
@@ -54,7 +54,7 @@ export class BulletinBoardModel {
         ////
 
         return post_id;
-    }
+    };
 
     private getCreateQuery(): string {
         const query: string =
@@ -62,10 +62,10 @@ export class BulletinBoardModel {
         return query;
     }
 
-    public async loadPostDetail(
+    public loadPostDetail = async (
         post_id: string,
         user_uniq_id: string
-    ): Promise<RowDataPacket[]> {
+    ): Promise<RowDataPacket[]> => {
         const query: string = this.getLoadPostDetailQuery();
         const values = { post_id, user_uniq_id };
         const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
@@ -73,7 +73,7 @@ export class BulletinBoardModel {
             values
         );
         return rows;
-    }
+    };
     private getLoadPostDetailQuery(): string {
         const query: string = `select
         post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
@@ -88,7 +88,7 @@ export class BulletinBoardModel {
         return query;
     }
 
-    public async userIDSearch(post_id: string): Promise<RowDataPacket[]> {
+    public userIDSearch = async (post_id: string): Promise<RowDataPacket[]> => {
         const query: string = this.getUserIDSearchQuery();
         const values = [post_id];
         const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
@@ -96,19 +96,21 @@ export class BulletinBoardModel {
             values
         );
         return rows;
-    }
+    };
     private getUserIDSearchQuery() {
         const query: string = "select user_uniq_id from post where post_id = ?";
         return query;
     }
 
-    public async deletePost(post_id: string) {
+    public deletePost = async (post_id: string) => {
         const query = this.getDeleteQuery();
         const values = [post_id];
         await pool.execute(query, values);
-    }
+    };
     private getDeleteQuery() {
         const query: string = "Delete from post where post_id = ?";
         return query;
     }
 }
+
+export default BulletinBoardModel;
