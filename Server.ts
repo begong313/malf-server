@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express from "express";
 import passportInit from "./passport";
 import cors from "cors";

@@ -9,9 +9,9 @@
         "bcrypt": "^5.1.0",
         "body-parser": "^1.20.2",
         "concurrently": "^8.2.0",
-        "cookie-session": "^2.0.0",
         "cors": "^2.8.5",
         "cross-env": "^7.0.3",
+        "d": "^1.0.1",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "express-session": "^1.17.3",
@@ -27,8 +27,8 @@
         "passport-local": "^1.0.0",
         "path": "^0.12.7",
         "pm2": "^5.3.0",
+        "reflect-metadata": "^0.1.13",
         "rimraf": "^5.0.1",
-        "session-file-store": "^1.5.0",
         "shortid": "^2.2.16",
         "typedi": "^0.10.0",
         "typescript": "^5.1.6"
@@ -47,15 +47,12 @@
     "description": "",
     "devDependencies": {
         "@types/bcrypt": "^5.0.0",
-        "@types/connect-flash": "^0.0.37",
-        "@types/cookie-session": "^2.0.44",
         "@types/express-session": "^1.17.7",
         "@types/jsonwebtoken": "^9.0.2",
         "@types/multer": "^1.4.7",
         "@types/passport-google-oauth20": "^2.0.11",
         "@types/passport-kakao": "^1.0.0",
         "@types/passport-local": "^1.0.35",
-        "@types/session-file-store": "^1.2.2",
         "@types/shortid": "^0.0.29"
     }
 }
