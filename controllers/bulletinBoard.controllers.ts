@@ -10,7 +10,7 @@ import { BulletinBoardModel } from "../models/bulletinBoard.model";
 import { Container } from "typedi";
 
 export class BulletinBoardController {
-    public bulletinBoard = Container.get(BulletinBoardModel);
+    public bulletinBoard = new BulletinBoardModel();
     public async loadPostList(
         request: Request,
         response: Response,
