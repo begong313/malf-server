@@ -22,10 +22,11 @@ async function verifyToken(
     next: NextFunction
 ) {
     try {
-        const { user_uniq_id } = jwt.verify(
-            request.headers.authorization!,
-            passportConfig.jwt.secretKey
-        ) as DataStoredInToken;
+        // const { user_uniq_id } = jwt.verify(
+        //     request.headers.authorization!,
+        //     passportConfig.jwt.secretKey
+        // ) as DataStoredInToken;
+        const user_uniq_id = request.headers.authorization;
         const [findUser]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
             "select user_uniq_id from user_id where user_uniq_id = ?",
             [user_uniq_id]
