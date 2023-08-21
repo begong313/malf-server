@@ -5,8 +5,9 @@ import axios from "axios";
 import jwtGenerate from "../lib/jwtGenerator";
 import { getUserUniqId, searchUserID, signUP } from "../passport/lib";
 import { RowDataPacket } from "mysql2";
-import getServerUrl from "../lib/getServerURL";
 import { HttpException } from "../exeptions/HttpException";
+import { oauthConfig } from "../config/oauth_config";
+import serverConfig from "../config/server_config";
 
 /* 라인 소셜로그인 Redirect url*/
 export class AuthController {
@@ -17,8 +18,8 @@ export class AuthController {
         response: Response,
         next: NextFunction
     ) => {
-        const client_id: string = process.env.LINE_ID!;
-        const server_url: string = getServerUrl();
+        const client_id: string = oauthConfig.line.clientID;
+        const server_url: string = serverConfig.serverURL;
         const state: string = shortid.generate();
         const lineAuthURL: string = `${this.lineUrl}/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}/auth/line/callback&state=${state}&scope=profile%20openid%20email`;
         response.redirect(lineAuthURL);
@@ -37,7 +38,7 @@ export class AuthController {
 
         // const state: string = request.query.state as string;
         const code: string = request.query.code as string;
-        const server_url: string = getServerUrl();
+        const server_url: string = serverConfig.serverURL;
 
         // access token 받아오기
         var headers = {
@@ -129,5 +130,11 @@ export class AuthController {
             return;
         }
         next(new HttpException(400, "로그인 실패 "));
+    };
+
+    public tokenPublish = (request: Request, response: Response) => {
+        const user_uniq_id = response.locals.decoded;
+        const jwtToken = jwtGenerate(user_uniq_id);
+        response.status(200).json({ status: 200, token: jwtToken });
     };
 }

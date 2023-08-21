@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { passportConfig } from "../config/passport_config";
 import { NextFunction, Request, Response } from "express";
 import { HttpException } from "../exeptions/HttpException";
 import { DataStoredInToken } from "../interfaces/auth.interface";

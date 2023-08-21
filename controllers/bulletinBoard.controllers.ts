@@ -3,16 +3,13 @@ bulletinBoard controller
 */
 
 import { NextFunction, Request, Response } from "express";
-import pool from "../lib/dbConnector";
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
 import BulletinBoardModel from "../models/bulletinBoard.model";
 import { Container } from "typedi";
 
 export class BulletinBoardController {
     public bulletinBoard = Container.get(BulletinBoardModel);
-
-    // public bulletinBoard;;
 
     public loadPostList = async (
         request: Request,
@@ -48,6 +45,9 @@ export class BulletinBoardController {
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
+
+        console.log("헤더", request.headers);
+        console.log("이미지 파일?", request.files);
         if (imageFiles == 0) {
             picDIRList.push("default.jpeg");
         } else {
@@ -64,7 +64,7 @@ export class BulletinBoardController {
             meeting_location: request.body.meeting_location,
             meeting_start_time: request.body.meeting_start_time,
             user_uniq_id: response.locals.decoded,
-            category: request.body.category, // 카테고리는 미완성임
+            category: request.body.category, // 1~8 validation 추가해야함
             picDIRList: JSON.stringify(picDIRList),
         };
 
@@ -156,24 +156,20 @@ export class BulletinBoardController {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
 
-        const selectQuery: string = `select * from post_like where post_id = ? and user_uniq_id = ?`;
-        const insertQuery: string = `insert into post_like (post_id, user_uniq_id) values (?, ?)`;
-        const deleteQuery: string = `delete from post_like where post_id = ? and user_uniq_id = ?`;
-        const values = [post_id, user_uniq_id];
         try {
-            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-                selectQuery,
-                values
+            const rows = await this.bulletinBoard.searchLike(
+                post_id,
+                user_uniq_id
             );
             if (rows.length == 0) {
-                await pool.execute(insertQuery, values);
+                await this.bulletinBoard.setlike(post_id, user_uniq_id);
                 response.status(200).json({
                     status: 200,
                     message: "좋아요 등록 성공",
                 });
                 return;
             }
-            await pool.execute(deleteQuery, values);
+            await this.bulletinBoard.deletelike(post_id, user_uniq_id);
             response.status(200).json({
                 status: 200,
                 message: "좋아요 삭제성공",

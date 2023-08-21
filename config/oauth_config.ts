@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: `.env.${process.env.NODE_ENV || "development"}` });
 
-interface passportConfig {
+interface oauthConfig {
     jwt: {
         secretKey: string;
     };
@@ -15,24 +15,30 @@ interface passportConfig {
         clientSecret: string;
         callbackURL: string;
     };
+    line: {
+        clientID: string;
+    };
     setting: {
         session: boolean;
         failureRedirect: string;
     };
 }
 
-const passportConfig: passportConfig = {
+const oauthConfig: oauthConfig = {
     jwt: {
-        secretKey: process.env.JWT_SIGN || "",
+        secretKey: process.env.JWT_SIGN!,
     },
     kakao: {
-        clientID: process.env.KAKAO_ID || "",
+        clientID: process.env.KAKAO_ID!,
         callbackURL: "/auth/kakao/callback",
     },
     google: {
-        clientID: process.env.GOOGLE_ID || "",
-        clientSecret: process.env.GOOGLE_SECRET || "",
+        clientID: process.env.GOOGLE_ID!,
+        clientSecret: process.env.GOOGLE_SECRET!,
         callbackURL: "/auth/google/callback",
+    },
+    line: {
+        clientID: process.env.LINE_ID!,
     },
     setting: {
         session: false,
@@ -40,4 +46,4 @@ const passportConfig: passportConfig = {
     },
 };
 
-export { passportConfig };
+export { oauthConfig };

@@ -1,17 +1,15 @@
 import { Request, Response } from "express";
-import pool from "../lib/dbConnector";
+
+import Container from "typedi";
+import { UserInfoModel } from "../models/userInfo.model";
 
 export class UserInfoController {
+    public userInfo = Container.get(UserInfoModel);
     public firstSetInfo = async (request: Request, response: Response) => {
-        if (request.headers.authorization == undefined) {
-            response.status(400).json({
-                status: 400,
-                message: "사용자 정보가 없습니다",
-            });
-            return;
-        }
         try {
+            // 전처리 부분 따로 빼야함.
             const requiredInfo = {
+                user_uniq_id: response.locals.decoded,
                 user_type: request.body.user_type,
                 nation: request.body.country,
                 gender: request.body.gender,
@@ -32,42 +30,14 @@ export class UserInfoController {
                 }
             }
             const additionalInfo = {
+                user_uniq_id: response.locals.decoded,
                 description: request.body.description || null,
                 able_language: request.body.able_language || null,
                 interests: request.body.interests || null,
                 profile_pic: JSON.stringify(picDIRList),
             };
-
-            const requiredInfoQuery: string =
-                "insert into user_require_info (user_uniq_id, user_type, nation, gender, nick_name, birthday, default_language) values (?,?,?,?,?,?,?)";
-            const requiredValues = [
-                request.headers.authorization,
-                requiredInfo.user_type,
-                requiredInfo.nation,
-                requiredInfo.gender,
-                requiredInfo.nickname,
-                requiredInfo.birthday,
-                requiredInfo.default_language,
-            ];
-            const additionalInfoQuery: string =
-                "insert into user_additional_info (user_uniq_id, description, able_language, interests, profile_pic) values (?,?,?,?,?)";
-            const additionalValues = [
-                request.headers.authorization,
-                additionalInfo.description,
-                additionalInfo.able_language,
-                additionalInfo.interests,
-                additionalInfo.profile_pic,
-            ];
-            await pool.execute(
-                "delete from user_require_info where user_uniq_id = ?",
-                [request.headers.authorization]
-            );
-            await pool.execute(
-                "delete from user_additional_info where user_uniq_id = ?",
-                [request.headers.authorization]
-            );
-            await pool.execute(requiredInfoQuery, requiredValues);
-            await pool.execute(additionalInfoQuery, additionalValues);
+            await this.userInfo.setRequiredInfo(requiredInfo);
+            await this.userInfo.setAdditionalInfo(additionalInfo);
 
             response.status(200).json({
                 status: 200,

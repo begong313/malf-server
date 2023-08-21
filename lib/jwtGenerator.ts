@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { passportConfig } from "../config/passport_config";
+import { oauthConfig } from "../config/oauth_config";
 
 interface tokenPayload {
     user_uniq_id: string;
@@ -12,10 +12,10 @@ function jwtGenerate(userData: string) {
     };
 
     const jwtToken = {
-        refreshToken: jwt.sign(tokenPayload, passportConfig.jwt.secretKey, {
+        refreshToken: jwt.sign(tokenPayload, oauthConfig.jwt.secretKey, {
             expiresIn: "7d",
         }),
-        accessToken: jwt.sign(tokenPayload, passportConfig.jwt.secretKey, {
+        accessToken: jwt.sign(tokenPayload, oauthConfig.jwt.secretKey, {
             expiresIn: "7d",
         }),
     };

@@ -4,7 +4,7 @@ import dbConnectData from "../config/db_config";
 const env: string = process.env.NODE_ENV || "development";
 
 var pool: mysql.Pool = mysql.createPool({
-    ...dbConnectData[env],
+    ...dbConnectData,
     namedPlaceholders: true,
 });
 

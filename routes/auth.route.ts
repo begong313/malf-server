@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import { AuthController } from "../controllers/auth.controllers";
-import { passportConfig } from "../config/passport_config";
+import { oauthConfig } from "../config/oauth_config";
 import { Routes } from "../interfaces/routes.interface";
 
 export class AuthRoute implements Routes {
@@ -18,7 +18,7 @@ export class AuthRoute implements Routes {
         this.router.get(`${this.path}/kakao`, passport.authenticate("kakao"));
         this.router.get(
             `${this.path}/kakao/callback`,
-            passport.authenticate("kakao", passportConfig.setting),
+            passport.authenticate("kakao", oauthConfig.setting),
             this.auth.loginCallback
         );
 
@@ -29,7 +29,7 @@ export class AuthRoute implements Routes {
         );
         this.router.get(
             `${this.path}/google/callback`,
-            passport.authenticate("google", passportConfig.setting),
+            passport.authenticate("google", oauthConfig.setting),
             this.auth.loginCallback
         );
 
@@ -44,7 +44,7 @@ export class AuthRoute implements Routes {
             (request: Request, response: Response, next: NextFunction) => {
                 passport.authenticate(
                     "local",
-                    passportConfig.setting,
+                    oauthConfig.setting,
                     (err: any, user: any, info: any) => {
                         if (err) return next(err);
 
@@ -72,6 +72,12 @@ export class AuthRoute implements Routes {
                 )(request, response, next);
             },
             this.auth.loginCallback
+        );
+
+        // access token publish
+        this.router.post(
+            `${this.path}/token-inssuance`,
+            this.auth.tokenPublish
         );
 
         this.router.get(`${this.path}/login-error`, this.auth.loginError);

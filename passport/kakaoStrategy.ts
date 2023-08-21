@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy } from "passport-kakao";
-import { passportConfig } from "../config/passport_config";
+import { oauthConfig } from "../config/oauth_config";
 import jwtGenerate from "../lib/jwtGenerator";
 
 import { getUserUniqId } from "./lib";
@@ -8,7 +8,7 @@ import { getUserUniqId } from "./lib";
 function kakao() {
     passport.use(
         new Strategy(
-            passportConfig.kakao,
+            oauthConfig.kakao,
             async (
                 accessToken: any,
                 refreshToken: any,

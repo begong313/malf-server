@@ -30,7 +30,7 @@ export class ChatRoomRouter implements Routes {
         // 채팅방 입장 신청리스트 가져오기
         this.router.get(
             `${this.path}/:id/agreement`,
-            this.chatRoom.getEnterRequestChatroom
+            this.chatRoom.loadEnterRequestChatroom
         );
 
         //채팅방 입장 허가(승인)
@@ -54,7 +54,7 @@ export class ChatRoomRouter implements Routes {
         //참여 맴버 가져오기
         this.router.get(
             `${this.path}/:id/members`,
-            this.chatRoom.getChatMembers
+            this.chatRoom.loadChatMembers
         );
     }
 }

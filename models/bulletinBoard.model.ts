@@ -18,16 +18,6 @@ class BulletinBoardModel {
         );
         return rows;
     };
-    private getLoadPostListQuery(): string {
-        const query: string = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
-        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
-        post.capacity as meeting_capacity, post.picture as meeting_pic,post.location as meeting_location, 
-        post.start_time as meeting_start_time 
-        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
-        Limit ? offset ?`;
-        return query;
-    }
-
     public createPost = async (postBody: any): Promise<number> => {
         const query: string = this.getCreateQuery();
         const values = [
@@ -56,12 +46,6 @@ class BulletinBoardModel {
         return post_id;
     };
 
-    private getCreateQuery(): string {
-        const query: string =
-            "insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?)";
-        return query;
-    }
-
     public loadPostDetail = async (
         post_id: string,
         user_uniq_id: string
@@ -74,6 +58,68 @@ class BulletinBoardModel {
         );
         return rows;
     };
+
+    public userIDSearch = async (post_id: string): Promise<RowDataPacket[]> => {
+        const query: string = this.getUserIDSearchQuery();
+        const values = [post_id];
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    };
+
+    public deletePost = async (post_id: string) => {
+        const query = this.getDeleteQuery();
+        const values = [post_id];
+        await pool.execute(query, values);
+    };
+
+    public searchLike = async (
+        post_id: string,
+        user_uniq_id: string
+    ): Promise<RowDataPacket[]> => {
+        const query: string = this.getDetectLikeQuert();
+        const values = [post_id, user_uniq_id];
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    };
+
+    public setlike = async (
+        post_id: string,
+        user_uniq_id: string
+    ): Promise<void> => {
+        const query: string = this.getInsertLikeQuert();
+        const values = [post_id, user_uniq_id];
+        await pool.execute(query, values);
+    };
+
+    public deletelike = async (
+        post_id: string,
+        user_uniq_id: string
+    ): Promise<void> => {
+        const query: string = this.getDeleteLikeQuert();
+        const values = [post_id, user_uniq_id];
+        await pool.execute(query, values);
+    };
+
+    private getLoadPostListQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity as meeting_capacity, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time 
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
+        Limit ? offset ?`;
+        return query;
+    }
+    private getCreateQuery(): string {
+        const query: string =
+            "insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?)";
+        return query;
+    }
     private getLoadPostDetailQuery(): string {
         const query: string = `select
         post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
@@ -87,28 +133,25 @@ class BulletinBoardModel {
         where post_id = :post_id`;
         return query;
     }
-
-    public userIDSearch = async (post_id: string): Promise<RowDataPacket[]> => {
-        const query: string = this.getUserIDSearchQuery();
-        const values = [post_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
-    };
-    private getUserIDSearchQuery() {
+    private getUserIDSearchQuery(): string {
         const query: string = "select user_uniq_id from post where post_id = ?";
         return query;
     }
-
-    public deletePost = async (post_id: string) => {
-        const query = this.getDeleteQuery();
-        const values = [post_id];
-        await pool.execute(query, values);
-    };
-    private getDeleteQuery() {
+    private getDeleteQuery(): string {
         const query: string = "Delete from post where post_id = ?";
+        return query;
+    }
+
+    private getDetectLikeQuert(): string {
+        const query: string = `select * from post_like where post_id = ? and user_uniq_id = ?`;
+        return query;
+    }
+    private getInsertLikeQuert(): string {
+        const query: string = `insert into post_like (post_id, user_uniq_id) values (?, ?)`;
+        return query;
+    }
+    private getDeleteLikeQuert(): string {
+        const query: string = `delete from post_like where post_id = ? and user_uniq_id = ?`;
         return query;
     }
 }

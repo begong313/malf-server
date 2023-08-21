@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import pool from "../lib/dbConnector";
 
-import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
+import { Container } from "typedi";
+import { ChatRoomModel } from "../models/chatRoom.model";
 
 export class ChatRoomController {
+    public chatRoom = Container.get(ChatRoomModel);
     /* 
 채팅방 참가 신청 
 todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
@@ -16,18 +18,10 @@ todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
     ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
-
-        const query: string = `insert into post_want_join (post_id, user_uniq_id) values (?,?)`;
-        const values: any[] = [post_id, user_uniq_id];
         try {
-            await pool.execute(query, values);
-            response.status(200).json({
-                status: 200,
-                message: "채팅방 참가신청 성공",
-            });
+            this.chatRoom.wantJoinChatRoom(post_id, user_uniq_id);
         } catch (err) {
             // 개시글이 없을때 에러 처리해야함.
-
             next(new HttpException(400, "채팅방 참가 신청 실패"));
         }
     };
@@ -44,12 +38,10 @@ Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lo
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
 
-        const query: string = `delete from post_want_join where post_id = ? and user_uniq_id = ? `;
-        const values = [post_id, user_uniq_id];
         try {
-            const [data]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-                query,
-                values
+            const data = await this.chatRoom.cancelJoinChatRoom(
+                post_id,
+                user_uniq_id
             );
             //todo :글이 없을때 계속 요청을 보낼수가 있음.
             console.log(data.affectedRows);
@@ -66,21 +58,17 @@ Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lo
 채팅방 참가요청 리스트 불러오기
 todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을 보내줄것인지 정하기
 */
-    public getEnterRequestChatroom = async (
+    public loadEnterRequestChatroom = async (
         request: Request,
         response: Response,
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        const user_uniq_id = response.locals.decoded;
+        // const user_uniq_id = response.locals.decoded;
 
         try {
-            const query: string = `select * from post_want_join join user_require_info on post_want_join.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
-            const values: string[] = [post_id];
-            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-                query,
-                values
-            );
+            const rows: RowDataPacket[] =
+                await this.chatRoom.loadEnterRequestChatRoom(post_id);
             response.status(200).json({
                 status: 200,
                 data: rows,
@@ -100,17 +88,11 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        const user_uniq_id = response.locals.decoded;
-
+        // const user_uniq_id = response.locals.decoded;
         const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디
-        const insertQuery: string = `insert into post_participation (post_id, user_uniq_id) values (?,?)`;
-        const deleteQuery: string = `delete from post_want_join where post_id = ? and user_uniq_id = ?`;
-        const values = [post_id, applicant_uniq_id];
+
         try {
-            await Promise.all([
-                pool.execute(insertQuery, values),
-                pool.execute(deleteQuery, values),
-            ]);
+            await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
 
             response.status(200).json({
                 status: 200,
@@ -131,13 +113,14 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        const user_uniq_id = response.locals.decoded;
-
+        // const user_uniq_id = response.locals.decoded;
         const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디를 어떻게 가져올 것인가
-        const query: string = `delete from post_want_join where post_id = ? and user_uniq_id = ? `;
-        const values = [post_id, applicant_uniq_id];
+
         try {
-            await pool.execute(query, values);
+            await this.chatRoom.disagreeEnterChatRoom(
+                post_id,
+                applicant_uniq_id
+            );
             response.status(200).json({
                 status: 200,
                 message: "채팅방 입장 거절 성공",
@@ -156,10 +139,8 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
 
-        const query: string = `delete from post_participation where post_id = ? and user_uniq_id = ? `;
-        const values = [post_id, user_uniq_id];
         try {
-            await pool.execute(query, values);
+            await this.chatRoom.leaveChatRoom(post_id, user_uniq_id);
             response.status(200).json({
                 status: 200,
                 message: "채팅방 떠나기 성공",
@@ -173,19 +154,14 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
 채팅방 맴버 가져오기 
 todo : 어떤 정보를 가져올지 정해야됨
 */
-    public getChatMembers = async (
+    public loadChatMembers = async (
         request: Request,
         response: Response,
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        const query: string = `select * from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
-        const values = [post_id];
         try {
-            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-                query,
-                values
-            );
+            const rows = await this.chatRoom.loadChatMembers(post_id);
             response.status(200).json({
                 status: 200,
                 data: rows,

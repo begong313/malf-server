@@ -2,3 +2,7 @@ node_modules
 .DS_Store
 .env
 dist
+.env.test
+.env.production
+.env.development
+logs
