@@ -39,6 +39,7 @@ async function signUP(
     }
 
     const user_uniq_id: string = prefix + profile_ID;
+    console.log(user_uniq_id);
     //휴대폰 버놓 부분은 따로 분리해야 함
     const insertAQuery = `insert into user_id (user_uniq_id, account_type, phone_number) values (?,?,'12222223456')`;
     await pool.execute(insertAQuery, [user_uniq_id, platform]);

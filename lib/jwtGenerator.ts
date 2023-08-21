@@ -13,10 +13,10 @@ function jwtGenerate(userData: string) {
 
     const jwtToken = {
         refreshToken: jwt.sign(tokenPayload, oauthConfig.jwt.secretKey, {
-            expiresIn: "7d",
+            expiresIn: "365d",
         }),
         accessToken: jwt.sign(tokenPayload, oauthConfig.jwt.secretKey, {
-            expiresIn: "7d",
+            expiresIn: "365d",
         }),
     };
 
