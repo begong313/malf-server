@@ -97,6 +97,7 @@ export class AuthController {
 
         try {
             //이부분이 쫌 오래걸리는듯
+            console.log("비밀번호 해싱중");
             const hashedPWD = await bcrypt.hash(password, 16);
             await signUP("local", userEmail, hashedPWD);
         } catch (err) {
