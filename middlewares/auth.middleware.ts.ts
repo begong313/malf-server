@@ -4,6 +4,7 @@ import { HttpException } from "../exeptions/HttpException";
 import { DataStoredInToken } from "../interfaces/auth.interface";
 import pool from "../lib/dbConnector";
 import { FieldPacket, RowDataPacket } from "mysql2";
+import { oauthConfig } from "../config/oauth_config";
 
 // const getAuthorization = (req) => {
 //     const coockie = req.cookies['Authorization'];
@@ -21,11 +22,11 @@ async function verifyToken(
     next: NextFunction
 ) {
     try {
-        // const { user_uniq_id } = jwt.verify(
-        //     request.headers.authorization!,
-        //     passportConfig.jwt.secretKey
-        // ) as DataStoredInToken;
-        const user_uniq_id = request.headers.authorization;
+        const { user_uniq_id } = jwt.verify(
+            request.headers.authorization!,
+            oauthConfig.jwt.secretKey
+        ) as DataStoredInToken;
+        // const user_uniq_id = request.headers.authorization;
         const [findUser]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
             "select user_uniq_id from user_id where user_uniq_id = ?",
             [user_uniq_id]
