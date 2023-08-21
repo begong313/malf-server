@@ -46,9 +46,9 @@ export class BulletinBoardController {
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
 
-        console.log("헤더", request.headers);
-        console.log("이미지 파일?", request.files);
-        if (imageFiles == 0) {
+        console.log("Header", request);
+        console.log("imagefile?", request.files);
+        if (imageFiles == undefined) {
             picDIRList.push("default.jpeg");
         } else {
             //사진 dir정보
