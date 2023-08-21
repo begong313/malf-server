@@ -16,7 +16,7 @@ function jwtGenerate(userData: string) {
             expiresIn: "365d",
         }),
         accessToken: jwt.sign(tokenPayload, oauthConfig.jwt.secretKey, {
-            expiresIn: "365d",
+            expiresIn: "10s",
         }),
     };
 
