@@ -173,7 +173,9 @@ todo : 어떤 정보를 가져올지 정해야됨
         }
     };
 
-    public soketJS = async () => {};
+    public soketJS = async (request: Request, response: Response) => {
+        // const socket  = socket.on('connection', (socket: SocketIO.Socket) => {}
+    };
 
     /* 만들어야 할 기능 
 1. 주석의 Todo들

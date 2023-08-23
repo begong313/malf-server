@@ -15,32 +15,32 @@ export class AuthRoute implements Routes {
 
     private initializeRoutes() {
         //for kakao
-        this.router.get(`${this.path}/kakao`, passport.authenticate("kakao"));
+        this.router.get(`/kakao`, passport.authenticate("kakao"));
         this.router.get(
-            `${this.path}/kakao/callback`,
+            `/kakao/callback`,
             passport.authenticate("kakao", oauthConfig.setting),
             this.auth.loginCallback
         );
 
         //for google
         this.router.get(
-            `${this.path}/google`,
+            `/google`,
             passport.authenticate("google", { scope: ["profile"] })
         );
         this.router.get(
-            `${this.path}/google/callback`,
+            `/google/callback`,
             passport.authenticate("google", oauthConfig.setting),
             this.auth.loginCallback
         );
 
         //for line
-        this.router.get(`${this.path}/line`, this.auth.lineRedirect);
-        this.router.get(`${this.path}/line/callback`, this.auth.lineCallback);
+        this.router.get(`/line`, this.auth.lineRedirect);
+        this.router.get(`/line/callback`, this.auth.lineCallback);
 
         //for local
-        this.router.post(`${this.path}/local/join`, this.auth.localJoin); //회원가입
+        this.router.post(`/local/join`, this.auth.localJoin); //회원가입
         this.router.post(
-            `${this.path}/local/login`,
+            `/local/login`,
             (request: Request, response: Response, next: NextFunction) => {
                 passport.authenticate(
                     "local",
@@ -50,9 +50,7 @@ export class AuthRoute implements Routes {
 
                         if (!user) {
                             if (info == undefined) {
-                                return response.redirect(
-                                    `${this.path}/login-error`
-                                );
+                                return response.redirect(`/login-error`);
                             }
                             return response
                                 .status(401)
@@ -75,11 +73,8 @@ export class AuthRoute implements Routes {
         );
 
         // access token publish
-        this.router.post(
-            `${this.path}/token-inssuance`,
-            this.auth.tokenPublish
-        );
+        this.router.post(`/token-inssuance`, this.auth.tokenPublish);
 
-        this.router.get(`${this.path}/login-error`, this.auth.loginError);
+        this.router.get(`/login-error`, this.auth.loginError);
     }
 }
