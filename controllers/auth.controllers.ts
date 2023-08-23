@@ -11,7 +11,8 @@ import serverConfig from "../config/server_config";
 
 /* 라인 소셜로그인 Redirect url*/
 export class AuthController {
-    public lineUrl: string = "https://access.line.me";
+    public lineAccessURL: string = "https://access.line.me";
+    public lineAPIURL: string = "https://api.line.me";
 
     public lineRedirect = (
         request: Request,
@@ -21,7 +22,7 @@ export class AuthController {
         const client_id: string = oauthConfig.line.clientID;
         const server_url: string = serverConfig.serverURL;
         const state: string = shortid.generate();
-        const lineAuthURL: string = `${this.lineUrl}/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}/auth/line/callback&state=${state}&scope=profile%20openid%20email`;
+        const lineAuthURL: string = `${this.lineAccessURL}/oauth2/v2.1/authorize?response_type=code&client_id=${client_id}&redirect_uri=${server_url}/auth/line/callback&state=${state}&scope=profile%20openid%20email`;
         response.redirect(lineAuthURL);
     };
 
@@ -51,18 +52,19 @@ export class AuthController {
             client_id: process.env.LINE_ID,
             client_secret: process.env.LINE_SECRET,
         };
-        const tokenRequestUrl = `${this.lineUrl}/oauth2/v2.1/token`;
-
+        const tokenRequestUrl = `${this.lineAPIURL}/oauth2/v2.1/token`;
+        console.log(tokenRequestUrl);
         const apiresponse = await axios.post(tokenRequestUrl, dataTosend, {
             headers,
         });
+        console.log(apiresponse);
 
         //받아온 acess token으로 사용자 정보 요청
         //@ts-ignore
         var headers = {
             authorization: `Bearer ${apiresponse.data.access_token}`,
         };
-        const userdata = await axios.get(`${this.lineUrl}/v2/profile`, {
+        const userdata = await axios.get(`${this.lineAPIURL}/v2/profile`, {
             headers,
         });
 

@@ -5,6 +5,8 @@ import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
 
+import SocketIO from "socket.io";
+
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
     /* 
@@ -170,6 +172,8 @@ todo : 어떤 정보를 가져올지 정해야됨
             next(new HttpException(400, "신청목록 불러오기 실패"));
         }
     };
+
+    public soketJS = async () => {};
 
     /* 만들어야 할 기능 
 1. 주석의 Todo들
