@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
-import { RowDataPacket } from "mysql2";
+import { FieldPacket, RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
-
-import SocketIO from "socket.io";
+import pool from "../lib/dbConnector";
 
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
@@ -173,8 +172,25 @@ todo : 어떤 정보를 가져올지 정해야됨
         }
     };
 
-    public soketJS = async (request: Request, response: Response) => {
-        // const socket  = socket.on('connection', (socket: SocketIO.Socket) => {}
+    public enterChatRoom = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            "select * from post where post_id = ?",
+            [request.params.id]
+        );
+
+        if (room.length == 0) {
+            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
+            return;
+        }
+
+        const io = request.app.get("io");
+        const { rooms } = io.of("/chat").adapter;
+        console.log(rooms);
+        return response.send("Sdfs");
     };
 
     /* 만들어야 할 기능 

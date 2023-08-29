@@ -36,12 +36,13 @@ export class ChatRoomRouter implements Routes {
             this.chatRoom.disagreeEnterChatroom
         );
 
+        //채팅방 입장
+        this.router.get(`/:id/enter`, this.chatRoom.enterChatRoom);
+
         //채팅방 나가기
         this.router.delete(`/:id/leaving`, this.chatRoom.leaveChatroom);
 
         //참여 맴버 가져오기
         this.router.get(`/:id/members`, this.chatRoom.loadChatMembers);
-
-        this.router.get(`/socket`, this.chatRoom.soketJS);
     }
 }
