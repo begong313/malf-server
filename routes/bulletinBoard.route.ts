@@ -29,8 +29,12 @@ export class BulletinBoardRouter implements Routes {
         //글 세부창 불러오기
         this.router.get(`/posts/:id`, this.bulletinBoard.loadPostDetail);
 
-        // 글 업데이트(미구현)
-        this.router.patch(`/post/:id`, this.bulletinBoard.updatePost);
+        // 글 업데이트
+        this.router.patch(
+            `/posts/:id`,
+            upload.array("image", 10),
+            this.bulletinBoard.updatePost
+        );
 
         //글 삭제
         this.router.delete(`/posts/:id`, this.bulletinBoard.deletePost);

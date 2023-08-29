@@ -19,7 +19,7 @@ try {
         new PictureRouter(),
     ]);
     const server = app.listen();
-    webSocket(server);
+    webSocket(server, app.app);
 } catch (err) {
     console.log(err);
 }

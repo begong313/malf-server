@@ -106,12 +106,60 @@ export class BulletinBoardController {
     };
 
     /*개시글 수정 */
-    public updatePost = (
+    public updatePost = async (
         request: Request,
         response: Response,
         next: NextFunction
     ) => {
-        /*todo*/
+        const imageFiles: any = request.files;
+        var picDIRList: string[] = []; //사진 경로 담을 array
+        //첨부사진이 없을 때
+
+        if (imageFiles == undefined) {
+            picDIRList.push("default.jpeg");
+        } else {
+            //사진 dir정보
+            for (var i = 0; i < imageFiles.length; i++) {
+                picDIRList.push(imageFiles[i].filename);
+            }
+        }
+
+        try {
+            const post_id: string = request.params.id;
+            const user_uniq_id: string = response.locals.decoded;
+            const postBody = {
+                title: request.body.title,
+                content: request.body.content,
+                capacity_local: request.body.capacity_local,
+                capacity_travel: request.body.capacity_travel,
+                meeting_location: request.body.meeting_location,
+                meeting_start_time: request.body.meeting_start_time,
+                category: request.body.category, // 1~8 validation 추가해야함
+                picDIRList: JSON.stringify(picDIRList),
+            };
+
+            const rows = await this.bulletinBoard.userIDSearch(post_id);
+            if (rows.length == 0) {
+                next(new HttpException(404, "없는 글입니다."));
+                return;
+            }
+            if (rows[0].user_uniq_id != user_uniq_id) {
+                next(new HttpException(401, "권한이 없습니다"));
+                return;
+            }
+            const updated_post_id: number = await this.bulletinBoard.updatePost(
+                post_id,
+                postBody
+            );
+            response.status(200).json({
+                status: 200,
+                post_id: updated_post_id,
+            });
+            return;
+        } catch (error) {
+            console.log(error);
+            next(new HttpException(400, "글 수정 실패"));
+        }
     };
 
     /*

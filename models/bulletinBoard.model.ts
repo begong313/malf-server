@@ -68,6 +68,31 @@ class BulletinBoardModel {
         );
         return rows;
     };
+    public updatePost = async (
+        post_id: string,
+        postBody: any
+    ): Promise<number> => {
+        const query = this.getUpdateQuery();
+
+        const values = [
+            postBody.title,
+            postBody.content,
+            postBody.picDIRList,
+            Number(postBody.capacity_local) + Number(postBody.capacity_travel),
+            postBody.meeting_location,
+            postBody.meeting_start_time,
+            postBody.category,
+            post_id,
+        ];
+        await pool.execute(query, values);
+        // ("update post title = ?, content = ?, picture = ?, capacity = ?, location = ?, start_time = ?, category_id = ? where post_id = ?");
+        const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+
+        return results.insertId;
+    };
 
     public deletePost = async (post_id: string) => {
         const query = this.getDeleteQuery();
@@ -135,6 +160,11 @@ class BulletinBoardModel {
     }
     private getUserIDSearchQuery(): string {
         const query: string = "select user_uniq_id from post where post_id = ?";
+        return query;
+    }
+    private getUpdateQuery(): string {
+        const query: string =
+            "update post set title = ?, content = ?, picture = ?, capacity = ?, location = ?, start_time = ?, category_id = ? where post_id = ?";
         return query;
     }
     private getDeleteQuery(): string {
