@@ -24,7 +24,8 @@ class BulletinBoardModel {
             postBody.title,
             postBody.content,
             postBody.picDIRList,
-            Number(postBody.capacity_local) + Number(postBody.capacity_travel),
+            postBody.capacity_local,
+            postBody.capacity_travel,
             postBody.meeting_location,
             postBody.meeting_start_time,
             postBody.user_uniq_id,
@@ -78,14 +79,15 @@ class BulletinBoardModel {
             postBody.title,
             postBody.content,
             postBody.picDIRList,
-            Number(postBody.capacity_local) + Number(postBody.capacity_travel),
+            postBody.capacity_local,
+            postBody.capacity_travel,
             postBody.meeting_location,
             postBody.meeting_start_time,
             postBody.category,
             post_id,
         ];
         await pool.execute(query, values);
-        // ("update post title = ?, content = ?, picture = ?, capacity = ?, location = ?, start_time = ?, category_id = ? where post_id = ?");
+
         const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
             query,
             values
@@ -134,7 +136,7 @@ class BulletinBoardModel {
     private getLoadPostListQuery(): string {
         const query: string = `select post.post_id, post.title, user_require_info.nick_name as author_nickname,
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
-        post.capacity as meeting_capacity, post.picture as meeting_pic,post.location as meeting_location, 
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time 
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
         Limit ? offset ?`;
@@ -142,14 +144,14 @@ class BulletinBoardModel {
     }
     private getCreateQuery(): string {
         const query: string =
-            "insert into post (title, content, picture, capacity, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?)";
+            "insert into post (title, content, picture, capacity_local,capacity_travel, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?,?)";
         return query;
     }
     private getLoadPostDetailQuery(): string {
         const query: string = `select
         post.post_id, post.title, post.content, user_require_info.nick_name as author_nickname,
         user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
-        post.capacity as meeting_capacity, post.picture as meeting_pic, post.location as meeting_location,
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic, post.location as meeting_location,
         post.start_time as meeting_start_time, post.category_id as category,
         (select count(*) from post_like where post_id = :post_id )as like_count,
         (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
@@ -164,7 +166,7 @@ class BulletinBoardModel {
     }
     private getUpdateQuery(): string {
         const query: string =
-            "update post set title = ?, content = ?, picture = ?, capacity = ?, location = ?, start_time = ?, category_id = ? where post_id = ?";
+            "update post set title = ?, content = ?, picture = ?, capacity_local = ?, capacity_travel= ?, location = ?, start_time = ?, category_id = ? where post_id = ?";
         return query;
     }
     private getDeleteQuery(): string {
