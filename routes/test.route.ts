@@ -24,7 +24,7 @@ export class TestRoute implements Routes {
             try {
                 const [rooms]: [RowDataPacket[], FieldPacket[]] =
                     await pool.execute(
-                        "SELECT title as title, user_uniq_id as owner, capacity as max  FROM post"
+                        "SELECT title as title, user_uniq_id as owner, capacity_local as max  FROM post"
                     );
                 console.log(rooms);
                 response.render("main", { rooms });
