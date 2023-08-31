@@ -46,8 +46,8 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "start": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=production PORT=80 pm2 start dist/app.js -i -1\"",
-        "test": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=test PORT=80 nodemon dist/app.js\"",
+        "start": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=production PORT=8000 pm2 start dist/app.js -i -1\"",
+        "test": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=test PORT=8000 nodemon dist/app.js\"",
         "dev": "concurrently \"npx tsc -w\" \"nodemon dist/app.js\""
     },
     "keywords": [],
