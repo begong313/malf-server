@@ -17,38 +17,30 @@ export class BulletinBoardRouter implements Routes {
 
     private initializeRoutes() {
         //홈화면 글 리스트 불러오기
-        this.router.get(`${this.path}/posts`, this.bulletinBoard.loadPostList);
+        this.router.get(`/posts`, this.bulletinBoard.loadPostList);
 
         //글작성, 사진 최대 개수 10개
         this.router.post(
-            `${this.path}/posts`,
+            `/posts`,
             upload.array("image", 10),
             this.bulletinBoard.createPost
         );
 
         //글 세부창 불러오기
-        this.router.get(
-            `${this.path}/posts/:id`,
-            this.bulletinBoard.loadPostDetail
-        );
+        this.router.get(`/posts/:id`, this.bulletinBoard.loadPostDetail);
 
-        // 글 업데이트(미구현)
+        // 글 업데이트
         this.router.patch(
-            `${this.path}/post/:id`,
+            `/posts/:id`,
+            upload.array("image", 10),
             this.bulletinBoard.updatePost
         );
 
         //글 삭제
-        this.router.delete(
-            `${this.path}/posts/:id`,
-            this.bulletinBoard.deletePost
-        );
+        this.router.delete(`/posts/:id`, this.bulletinBoard.deletePost);
 
         //좋아요 클릭
-        this.router.post(
-            `${this.path}/posts/:id/like`,
-            this.bulletinBoard.pushLike
-        );
+        this.router.post(`/posts/:id/like`, this.bulletinBoard.pushLike);
     }
 }
 
