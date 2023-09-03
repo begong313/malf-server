@@ -33,7 +33,7 @@ function webSocket(server: any, app: express.Application) {
 
         socket.on("chat", (data) => {
             console.log(data);
-            socket.emit("chat", { data });
+            socket.emit("chat", { ...data, sendAt: Date.now() });
         });
     });
     /*Test를위한코드*/
