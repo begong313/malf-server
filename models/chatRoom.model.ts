@@ -81,6 +81,24 @@ export class ChatRoomModel {
         return rows;
     };
 
+    public loadMyChatRooms = async (
+        user_uniq_id: string
+    ): Promise<RowDataPacket[]> => {
+        try {
+            const query: string = this.getLoadMyChatRoomsQuery();
+
+            const values: string[] = [user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+
     private getInsertWantJoinQuery(): string {
         const query: string = `insert into post_want_join (post_id, user_uniq_id) values (?,?)`;
         return query;
@@ -103,6 +121,10 @@ export class ChatRoomModel {
     }
     private getLoadChatMemberQuery(): string {
         const query: string = `select * from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
+        return query;
+    }
+    private getLoadMyChatRoomsQuery(): string {
+        const query: string = `select * from post_participation join post on post_participation.post_id = post.post_id where post_participation.user_uniq_id = ?`;
         return query;
     }
 }

@@ -193,6 +193,23 @@ todo : 어떤 정보를 가져올지 정해야됨
         return response.send("Sdfs");
     };
 
+    public loadMyChatRooms = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        try {
+            const rows = await this.chatRoom.loadMyChatRooms(user_uniq_id);
+            response.status(200).json({
+                status: 200,
+                data: rows,
+            });
+        } catch (err) {
+            next(new HttpException(400, "내 채팅방 불러오기 실패"));
+        }
+    };
+
     /* 만들어야 할 기능 
 1. 주석의 Todo들
 2. lock 을 사용해야 할거같음. 신청요청과 승락이 동시에 이루어지면 곤란한 상황 발생
