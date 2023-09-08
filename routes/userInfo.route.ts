@@ -16,7 +16,7 @@ export class UserInfoRouter implements Routes {
 
     private initializeRoutes() {
         this.router.post(
-            `${this.path}/first-set-info`,
+            `/first-set-info`,
             upload.array("image", 1),
             this.userInfo.firstSetInfo
         ); // 첫 실행시 유저정보 등록창

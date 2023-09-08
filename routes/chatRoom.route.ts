@@ -44,5 +44,8 @@ export class ChatRoomRouter implements Routes {
 
         //참여 맴버 가져오기
         this.router.get(`/:id/members`, this.chatRoom.loadChatMembers);
+
+        //본인이 참여한 맴버 가져오기
+        this.router.get("/chatrooms", this.chatRoom.loadMyChatRooms);
     }
 }
