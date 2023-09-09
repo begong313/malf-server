@@ -5,6 +5,7 @@ import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
 import pool from "../lib/dbConnector";
+import { request } from "http";
 
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
@@ -211,6 +212,37 @@ todo : 어떤 정보를 가져올지 정해야됨
         } catch (err) {
             next(new HttpException(400, "내 채팅방 불러오기 실패"));
         }
+    };
+
+    public sendImage = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const imageFiles: any = request.files;
+        var picDIRList: string[] = []; //사진 경로 담을 array
+        //첨부사진이 없을 때
+        if (imageFiles == undefined) {
+            next(new HttpException(400, "사진을 첨부해주세요"));
+            return;
+        } else {
+            //사진 dir정보
+            for (var i = 0; i < imageFiles.length; i++) {
+                picDIRList.push(imageFiles[i].filename);
+            }
+        }
+        const io = request.app.get("io").of("/chat");
+        io.to(request.params.id).emit("chat", {
+            sender: user_uniq_id,
+            room: request.params.id,
+            date: Date.now(),
+            message: picDIRList,
+        });
+        response.status(200).json({
+            status: 200,
+            message: "전송 성공",
+        });
     };
 
     /* 만들어야 할 기능 

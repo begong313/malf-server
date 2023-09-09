@@ -44,8 +44,8 @@ export class TestRoute implements Routes {
             }
         );
         this.router.get("/chat", (request, response) => {
-            const io = request.app.get("io");
-            io.to(1).emit("chat", { date: Date.now() });
+            const io = request.app.get("io").of("/chat");
+            io.to("1").emit("chat", { date: Date.now() });
             return response.send("Sdfs");
         });
     }
