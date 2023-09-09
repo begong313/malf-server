@@ -21,6 +21,10 @@ todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
         const user_uniq_id = response.locals.decoded;
         try {
             this.chatRoom.wantJoinChatRoom(post_id, user_uniq_id);
+            response.status(200).json({
+                status: 200,
+                message: "채팅방 참가신청 성공",
+            });
         } catch (err) {
             // 개시글이 없을때 에러 처리해야함.
             next(new HttpException(400, "채팅방 참가 신청 실패"));
@@ -65,7 +69,7 @@ todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
+        const user_uniq_id = response.locals.decoded;
 
         try {
             const rows: RowDataPacket[] =
@@ -89,19 +93,19 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디
+        const user_uniq_id = response.locals.decoded;
+        const applicant_uniq_id: string = request.body.user_uniq_id; //todo : 신청한 사람의 아이디
 
         try {
             await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
 
             response.status(200).json({
                 status: 200,
-                message: "채팅방 입장 등록 성공",
+                message: "채팅방 입장 승인 성공",
             });
         } catch (err) {
             // Todo : 만약 쿼리문이 하나만 성공하고 하나는 실패한다면?
-            next(new HttpException(400, "채팅방 입장 등록 실패"));
+            next(new HttpException(400, "채팅방 입장 승인 실패"));
         }
     };
 
@@ -114,8 +118,8 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디를 어떻게 가져올 것인가
+        const user_uniq_id = response.locals.decoded;
+        const applicant_uniq_id: string = request.body.user_uniq_id; //todo : 신청한 사람의 아이디
 
         try {
             await this.chatRoom.disagreeEnterChatRoom(
@@ -129,6 +133,26 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         } catch (err) {
             next(new HttpException(400, "채팅방 입장 거절 실패"));
         }
+    };
+    public enterChatRoom = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            "select * from post where post_id = ?",
+            [request.params.id]
+        );
+
+        if (room.length == 0) {
+            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
+            return;
+        }
+
+        const io = request.app.get("io");
+        const { rooms } = io.of("/chat").adapter;
+        console.log(rooms);
+        return response.send("Sdfs");
     };
 
     /* 채팅방 나가기*/
@@ -170,27 +194,6 @@ todo : 어떤 정보를 가져올지 정해야됨
         } catch (err) {
             next(new HttpException(400, "신청목록 불러오기 실패"));
         }
-    };
-
-    public enterChatRoom = async (
-        request: Request,
-        response: Response,
-        next: NextFunction
-    ) => {
-        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            "select * from post where post_id = ?",
-            [request.params.id]
-        );
-
-        if (room.length == 0) {
-            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
-            return;
-        }
-
-        const io = request.app.get("io");
-        const { rooms } = io.of("/chat").adapter;
-        console.log(rooms);
-        return response.send("Sdfs");
     };
 
     public loadMyChatRooms = async (

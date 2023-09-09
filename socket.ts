@@ -53,12 +53,17 @@ function webSocket(server: any, app: express.Application) {
         console.log(" chat 네임스페이스에 접속");
 
         socket.on("join", (data) => {
+            console.log("방번호 ", data);
             // data는 방 id. Id값으로 방에 접속
             socket.join(data); // 네임스페이스 아래에 존재하는 방에 접속
             socket.to(data).emit("join", {
                 user: "system",
                 chat: `${data}에 입장하셨습니다.`,
             });
+        });
+        socket.on("chat", (data) => {
+            console.log(data);
+            socket.to(data.room).emit("chat", { ...data, sendAt: Date.now() });
         });
 
         socket.on("disconnect", () => {
