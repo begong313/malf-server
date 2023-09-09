@@ -233,7 +233,7 @@ todo : 어떤 정보를 가져올지 정해야됨
             }
         }
         const io = request.app.get("io").of("/chat");
-        io.to(request.params.id).emit("chat", {
+        io.to(request.params.id).emit("image", {
             sender: user_uniq_id,
             room: request.params.id,
             date: Date.now(),
