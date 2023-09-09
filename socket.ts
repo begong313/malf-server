@@ -2,7 +2,12 @@ import SocketIO, { Socket } from "socket.io";
 import express from "express";
 
 function webSocket(server: any, app: express.Application) {
-    const io = new SocketIO.Server(server, { path: "/chatTest" });
+    const io = new SocketIO.Server(server, {
+        path: "/chatTest",
+        cors: {
+            origin: "*",
+        },
+    });
     app.set("io", io);
     io.on("connection", (socket: Socket) => {
         console.log("유저 접속");
