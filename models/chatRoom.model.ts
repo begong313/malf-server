@@ -124,7 +124,7 @@ export class ChatRoomModel {
         return query;
     }
     private getLoadMyChatRoomsQuery(): string {
-        const query: string = `select * from post_participation join post on post_participation.post_id = post.post_id where post_participation.user_uniq_id = ?`;
+        const query: string = `select post.picture as picture, post.title as title, (select count(*) from post_participation where post_id = post.post_id) as personnel from post_participation join post on post_participation.post_id = post.post_id where post_participation.user_uniq_id = ?`;
         return query;
     }
 }

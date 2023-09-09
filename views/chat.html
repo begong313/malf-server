@@ -30,7 +30,7 @@
 </form>
 <script src="/chatTest/socket.io.js"></script>
 <script>
-    const socket = io.connect("http://localhost:8000/chat", {
+    const socket = io.connect("http://13.125.43.68:8000/chat", {
         path: "/chatTest",
     });
     const urlData = new URL(location).pathname.split("/").at(-1);
