@@ -73,8 +73,8 @@ function webSocket(server: any, app: express.Application) {
                 //todo :  mysql로 가서 채팅방이 존재하는지 검사해야함
                 const chatdata = new Chat({
                     room: data.room,
-                    sender: data.user,
-                    message: data.chat,
+                    sender: data.sender,
+                    message: data.message,
                     sendAt: Date.now(),
                     type: 0,
                 });
