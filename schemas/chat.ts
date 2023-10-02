@@ -5,14 +5,14 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    user: {
+    sender: {
         type: String,
         required: true,
     },
-    chat: String,
+    message: String,
     gif: String,
 
-    createdAt: {
+    date: {
         type: Number,
         default: Date.now,
     },
