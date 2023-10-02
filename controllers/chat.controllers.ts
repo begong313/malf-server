@@ -49,12 +49,14 @@ export class ChatController {
         console.log("사진을 받았나?", picDIRList);
         const io = request.app.get("io").of("/chat");
         const room = request.params.id;
-        console.log();
+        console.log(room);
+        console.log(user_uniq_id);
         io.to(room).emit("chat", {
             sender: user_uniq_id,
             room: request.params.id,
             date: Date.now(),
             message: picDIRList,
+            type: 1,
         });
         response.status(200).json({
             status: 200,
