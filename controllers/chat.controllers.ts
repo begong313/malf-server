@@ -37,6 +37,7 @@ export class ChatController {
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
         if (imageFiles == undefined) {
+            console.log("사진못받음");
             next(new HttpException(400, "사진을 첨부해주세요"));
             return;
         } else {

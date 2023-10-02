@@ -62,10 +62,15 @@ function webSocket(server: any, app: express.Application) {
 
             // data는 방 id. Id값으로 방에 접속
             socket.join(data); // 네임스페이스 아래에 존재하는 방에 접속
-            chat.to(data).emit("join", {
-                user: "system",
-                chat: `${data}에 입장하셨습니다.`,
+            const chatdata = new Chat({
+                room: data.room,
+                sender: "notice",
+                message: "방에 입장했습니다.",
+                sendAt: Date.now(),
+                type: 2,
             });
+
+            chat.to(data).emit("join", chatdata);
         });
 
         socket.on("chat", async (data) => {
