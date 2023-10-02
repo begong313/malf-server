@@ -247,7 +247,7 @@ todo : 어떤 정보를 가져올지 정해야됨
         });
         response.status(200).json({
             status: 200,
-            message: "전송 성공",
+            message: "picDIRList",
         });
     };
 

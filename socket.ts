@@ -76,6 +76,7 @@ function webSocket(server: any, app: express.Application) {
                     sender: data.user,
                     message: data.chat,
                     sendAt: Date.now(),
+                    type: 0,
                 });
 
                 const collection = mongoose.connection.collection(data.room);

@@ -15,6 +15,12 @@ const chatSchema = new mongoose.Schema({
         type: Number,
         default: Date.now,
     },
+
+    // 0 : text, 1 : image
+    type: {
+        type: Number,
+        default: 0,
+    },
 });
 
 export default mongoose.model("Chat", chatSchema);
