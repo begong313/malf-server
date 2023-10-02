@@ -48,7 +48,9 @@ export class ChatController {
         }
         console.log("사진을 받았나?", picDIRList);
         const io = request.app.get("io").of("/chat");
-        io.to(request.params.id).emit("image", {
+        const room = request.params.id;
+        console.log();
+        io.to(room).emit("chat", {
             sender: user_uniq_id,
             room: request.params.id,
             date: Date.now(),
