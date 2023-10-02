@@ -7,6 +7,7 @@ import { RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
 import BulletinBoardModel from "../models/bulletinBoard.model";
 import { Container } from "typedi";
+import mongoose from "mongoose";
 
 export class BulletinBoardController {
     public bulletinBoard = Container.get(BulletinBoardModel);
@@ -69,7 +70,7 @@ export class BulletinBoardController {
         };
 
         const post_id: number = await this.bulletinBoard.createPost(postBody);
-
+        await mongoose.connection.createCollection(String(post_id));
         response.status(200).json({
             status: 200,
             post_id: post_id,
@@ -186,6 +187,14 @@ export class BulletinBoardController {
             }
 
             this.bulletinBoard.deletePost(post_id);
+
+            //글 삭제되면 Chat db 삭제되게 임시로
+            try {
+                mongoose.connection.db.dropCollection(post_id);
+            } catch (err) {
+                console.log(err);
+            }
+
             response.status(200).json({
                 status: 200,
                 message: "글 삭제 성공",

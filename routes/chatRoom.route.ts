@@ -37,10 +37,10 @@ export class ChatRoomRouter implements Routes {
         );
 
         //채팅방 입장
-        this.router.get(`/:id/enter`, this.chatRoom.enterChatRoom);
+        this.router.get(`/:id/chatroom`, this.chatRoom.enterChatRoom);
 
         //채팅방 나가기
-        this.router.delete(`/:id/leaving`, this.chatRoom.leaveChatroom);
+        this.router.delete(`/:id/chatroom`, this.chatRoom.leaveChatroom);
 
         //참여 맴버 가져오기
         this.router.get(`/:id/members`, this.chatRoom.loadChatMembers);

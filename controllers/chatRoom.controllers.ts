@@ -21,6 +21,10 @@ todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
         const user_uniq_id = response.locals.decoded;
         try {
             this.chatRoom.wantJoinChatRoom(post_id, user_uniq_id);
+            response.status(200).json({
+                status: 200,
+                message: "채팅방 참가신청 성공",
+            });
         } catch (err) {
             // 개시글이 없을때 에러 처리해야함.
             next(new HttpException(400, "채팅방 참가 신청 실패"));
@@ -65,7 +69,7 @@ todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
+        const user_uniq_id = response.locals.decoded;
 
         try {
             const rows: RowDataPacket[] =
@@ -89,19 +93,19 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디
+        const user_uniq_id = response.locals.decoded;
+        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
 
         try {
             await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
 
             response.status(200).json({
                 status: 200,
-                message: "채팅방 입장 등록 성공",
+                message: "채팅방 입장 승인 성공",
             });
         } catch (err) {
             // Todo : 만약 쿼리문이 하나만 성공하고 하나는 실패한다면?
-            next(new HttpException(400, "채팅방 입장 등록 실패"));
+            next(new HttpException(400, "채팅방 입장 승인 실패"));
         }
     };
 
@@ -114,8 +118,12 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         next: NextFunction
     ) => {
         const post_id: string = request.params.id;
-        // const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = "test_1"; //todo : 신청한 사람의 아이디를 어떻게 가져올 것인가
+        const user_uniq_id = response.locals.decoded;
+        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
+
+        if (request.query.user_uniq_id == undefined) {
+            next(new HttpException(400, "아이디를 찾을 수 업습니다."));
+        }
 
         try {
             await this.chatRoom.disagreeEnterChatRoom(
@@ -129,6 +137,27 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         } catch (err) {
             next(new HttpException(400, "채팅방 입장 거절 실패"));
         }
+    };
+    //채팅방 입장
+    public enterChatRoom = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            "select * from post where post_id = ?",
+            [request.params.id]
+        );
+
+        if (room.length == 0) {
+            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
+            return;
+        }
+
+        const io = request.app.get("io");
+        const { rooms } = io.of("/chat").adapter;
+        console.log(rooms);
+        return response.send("Sdfs");
     };
 
     /* 채팅방 나가기*/
@@ -172,27 +201,7 @@ todo : 어떤 정보를 가져올지 정해야됨
         }
     };
 
-    public enterChatRoom = async (
-        request: Request,
-        response: Response,
-        next: NextFunction
-    ) => {
-        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            "select * from post where post_id = ?",
-            [request.params.id]
-        );
-
-        if (room.length == 0) {
-            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
-            return;
-        }
-
-        const io = request.app.get("io");
-        const { rooms } = io.of("/chat").adapter;
-        console.log(rooms);
-        return response.send("Sdfs");
-    };
-
+    //참가한 채팅방 가져오기
     public loadMyChatRooms = async (
         request: Request,
         response: Response,
@@ -208,6 +217,38 @@ todo : 어떤 정보를 가져올지 정해야됨
         } catch (err) {
             next(new HttpException(400, "내 채팅방 불러오기 실패"));
         }
+    };
+
+    //채팅방 사진 전송
+    public sendImage = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const imageFiles: any = request.files;
+        var picDIRList: string[] = []; //사진 경로 담을 array
+        //첨부사진이 없을 때
+        if (imageFiles == undefined) {
+            next(new HttpException(400, "사진을 첨부해주세요"));
+            return;
+        } else {
+            //사진 dir정보
+            for (var i = 0; i < imageFiles.length; i++) {
+                picDIRList.push(imageFiles[i].filename);
+            }
+        }
+        const io = request.app.get("io").of("/chat");
+        io.to(request.params.id).emit("image", {
+            sender: user_uniq_id,
+            room: request.params.id,
+            date: Date.now(),
+            message: picDIRList,
+        });
+        response.status(200).json({
+            status: 200,
+            message: "picDIRList",
+        });
     };
 
     /* 만들어야 할 기능 

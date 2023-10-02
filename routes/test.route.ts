@@ -43,9 +43,27 @@ export class TestRoute implements Routes {
                 return response.render("chat", {});
             }
         );
-        this.router.get("/chat", (request, response) => {
-            const io = request.app.get("io");
-            io.emit("chat", { date: Date.now() });
+        this.router.get("/chat", async (request, response) => {
+            const io = request.app.get("io").of("/chat");
+
+            io.to("1").emit("chat", {
+                user: "test1",
+                chat: "sdfsdfs",
+                date: Date.now(),
+            });
+
+            return response.send("Sdfs");
+        });
+
+        this.router.get("/mdb", async (request, response) => {
+            const io = request.app.get("io").of("/chat");
+
+            io.to("23").emit("test", {
+                user: "test11",
+                chat: "sdfsdfs",
+                date: Date.now(),
+            });
+
             return response.send("Sdfs");
         });
     }
