@@ -59,6 +59,8 @@ export class ChatController {
             message: JSON.stringify(picDIRList),
             type: 1,
         });
+        const collection = mongoose.connection.collection(room);
+        await collection.insertOne(chatdata);
         io.to(room).emit("image", chatdata);
         response.status(200).json({
             status: 200,
