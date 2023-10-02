@@ -73,9 +73,9 @@ function webSocket(server: any, app: express.Application) {
                 //todo :  mysql로 가서 채팅방이 존재하는지 검사해야함
                 const chat = new Chat({
                     room: data.room,
-                    user: data.user,
-                    chat: data.chat,
-                    date: Date.now(),
+                    sender: data.user,
+                    message: data.chat,
+                    sendAt: Date.now(),
                 });
 
                 const collection = mongoose.connection.collection(data.room);

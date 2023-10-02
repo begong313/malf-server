@@ -10,9 +10,8 @@ const chatSchema = new mongoose.Schema({
         required: true,
     },
     message: String,
-    gif: String,
 
-    date: {
+    sendAt: {
         type: Number,
         default: Date.now,
     },
