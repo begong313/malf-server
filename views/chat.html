@@ -30,7 +30,7 @@
 </form>
 <script src="/chatTest/socket.io.js"></script>
 <script>
-    const socket = io.connect("http://malftravel.com/chat", {
+    const socket = io.connect("http://localhost:8000/chat", {
         path: "/chatTest",
     });
     const urlData = new URL(location).pathname.split("/").at(-1);
@@ -48,6 +48,15 @@
     socket.on("chat", function (data) {
         console.log(data);
     });
+    socket.on("test", function (data) {
+        console.log("서버로 chat 전송");
+        socket.emit("chat", {
+            room: urlData,
+            user: "test1",
+            chat: "sss",
+        });
+    });
+
     socket.on("image", function (data) {
         console.log(data);
     });

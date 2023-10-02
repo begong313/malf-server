@@ -1,5 +1,7 @@
 import SocketIO, { Socket } from "socket.io";
 import express from "express";
+import Chat from "./schemas/chat";
+import mongoose from "mongoose";
 
 function webSocket(server: any, app: express.Application) {
     const io = new SocketIO.Server(server, {
@@ -52,13 +54,12 @@ function webSocket(server: any, app: express.Application) {
 
     const chat = io.of("/chat");
     chat.on("connection", (socket: Socket) => {
-        // const interval = setInterval(() => {
-        //     socket.emit("news", "hello socket.io");
-        // }, 1000);
         console.log(" chat 네임스페이스에 접속");
 
         socket.on("join", (data) => {
+            //todo :  mysql로 가서 채팅방이 존재하는지 검사해야함
             console.log("방번호 ", data);
+
             // data는 방 id. Id값으로 방에 접속
             socket.join(data); // 네임스페이스 아래에 존재하는 방에 접속
             socket.to(data).emit("join", {
@@ -66,9 +67,24 @@ function webSocket(server: any, app: express.Application) {
                 chat: `${data}에 입장하셨습니다.`,
             });
         });
-        socket.on("chat", (data) => {
-            console.log(data);
-            socket.to(data.room).emit("chat", { ...data, sendAt: Date.now() });
+
+        socket.on("chat", async (data) => {
+            try {
+                //todo :  mysql로 가서 채팅방이 존재하는지 검사해야함
+                const chat = new Chat({
+                    room: data.room,
+                    user: data.user,
+                    chat: data.chat,
+                    date: Date.now(),
+                });
+
+                const collection = mongoose.connection.collection(data.room);
+                await collection.insertOne(chat);
+
+                socket.to(data.room).emit("chat", chat);
+            } catch (err) {
+                console.log(err);
+            }
         });
 
         socket.on("disconnect", () => {

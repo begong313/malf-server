@@ -3,7 +3,6 @@ import { ChatRoomController } from "../controllers/chatRoom.controllers";
 
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
-import upload from "../lib/multerCustom";
 
 export class ChatRoomRouter implements Routes {
     public path = "/chatroom";
@@ -38,22 +37,15 @@ export class ChatRoomRouter implements Routes {
         );
 
         //채팅방 입장
-        this.router.get(`/:id/enter`, this.chatRoom.enterChatRoom);
+        this.router.get(`/:id/chatroom`, this.chatRoom.enterChatRoom);
 
         //채팅방 나가기
-        this.router.delete(`/:id/leaving`, this.chatRoom.leaveChatroom);
+        this.router.delete(`/:id/chatroom`, this.chatRoom.leaveChatroom);
 
         //참여 맴버 가져오기
         this.router.get(`/:id/members`, this.chatRoom.loadChatMembers);
 
         //본인이 참여한 맴버 가져오기
         this.router.get("/chatrooms", this.chatRoom.loadMyChatRooms);
-
-        //사진 보내기
-        this.router.post(
-            "/:id/image",
-            upload.array("image", 10),
-            this.chatRoom.sendImage
-        );
     }
 }

@@ -5,7 +5,6 @@ import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
 import pool from "../lib/dbConnector";
-import { request } from "http";
 
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
@@ -95,7 +94,7 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
     ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = request.body.user_uniq_id; //todo : 신청한 사람의 아이디
+        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
 
         try {
             await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
@@ -120,7 +119,11 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
     ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: string = request.body.user_uniq_id; //todo : 신청한 사람의 아이디
+        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
+
+        if (request.query.user_uniq_id == undefined) {
+            next(new HttpException(400, "아이디를 찾을 수 업습니다."));
+        }
 
         try {
             await this.chatRoom.disagreeEnterChatRoom(
@@ -135,6 +138,7 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
             next(new HttpException(400, "채팅방 입장 거절 실패"));
         }
     };
+    //채팅방 입장
     public enterChatRoom = async (
         request: Request,
         response: Response,
@@ -197,6 +201,7 @@ todo : 어떤 정보를 가져올지 정해야됨
         }
     };
 
+    //참가한 채팅방 가져오기
     public loadMyChatRooms = async (
         request: Request,
         response: Response,
@@ -214,6 +219,7 @@ todo : 어떤 정보를 가져올지 정해야됨
         }
     };
 
+    //채팅방 사진 전송
     public sendImage = async (
         request: Request,
         response: Response,

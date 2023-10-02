@@ -7,6 +7,8 @@ import { Routes } from "./interfaces/routes.interface";
 import nunjucks from "nunjucks";
 import helmet from "helmet";
 import hpp from "hpp";
+import mongoConnect from "./schemas";
+
 export class Server {
     app: express.Application;
     env: string;
@@ -34,6 +36,7 @@ export class Server {
 
     private init(): void {
         this.app.set("port", this.port);
+        mongoConnect();
         if (process.env.NODE_ENV === "production") {
             this.app.use(
                 helmet({
