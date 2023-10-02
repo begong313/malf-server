@@ -2,6 +2,7 @@ import express from "express";
 import { Routes } from "../interfaces/routes.interface";
 import upload from "../lib/multerCustom";
 import { ChatController } from "../controllers/chat.controllers";
+import { verifyToken } from "../middlewares/auth.middleware.ts";
 
 export class ChatRouter implements Routes {
     public path = "/chat";
@@ -10,6 +11,7 @@ export class ChatRouter implements Routes {
 
     constructor() {
         this.initializeRoutes();
+        this.router.use(verifyToken);
     }
 
     private initializeRoutes() {
