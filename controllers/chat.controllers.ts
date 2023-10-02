@@ -52,10 +52,10 @@ export class ChatController {
         console.log(room);
         console.log(user_uniq_id);
 
-        io.to(room).emit("chat", {
+        io.to(room).emit("image", {
             sender: user_uniq_id || "default",
             room: request.params.id,
-            date: Date.now(),
+            sendAt: Date.now(),
             message: picDIRList,
             type: 1,
         });
