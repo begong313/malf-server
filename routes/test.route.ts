@@ -43,10 +43,10 @@ export class TestRoute implements Routes {
                 return response.render("chat", {});
             }
         );
-        this.router.get("/chat", async (request, response) => {
+        this.router.get("/chat/:id", async (request, response) => {
             const io = request.app.get("io").of("/chat");
-
-            io.to("1").emit("chat", {
+            const room = request.params.id;
+            io.to(room).emit("chat", {
                 user: "test1",
                 chat: "sdfsdfs",
                 date: Date.now(),
@@ -55,10 +55,10 @@ export class TestRoute implements Routes {
             return response.send("Sdfs");
         });
 
-        this.router.get("/mdb", async (request, response) => {
+        this.router.get("/mdb/:id", async (request, response) => {
             const io = request.app.get("io").of("/chat");
-
-            io.to("23").emit("test", {
+            const room = request.params.id;
+            io.to(room).emit("test", {
                 user: "test11",
                 chat: "sdfsdfs",
                 date: Date.now(),

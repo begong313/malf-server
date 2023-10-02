@@ -6,6 +6,7 @@ dist
 .env.production
 .env.development
 logs
+views
 views/main.html
 views/index.html
 views/index1.html
