@@ -10,8 +10,8 @@ export class ChatRouter implements Routes {
     public chat = new ChatController();
 
     constructor() {
-        this.initializeRoutes();
         this.router.use(verifyToken);
+        this.initializeRoutes();
     }
 
     private initializeRoutes() {
