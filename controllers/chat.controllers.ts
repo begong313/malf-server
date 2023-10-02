@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { HttpException } from "../exeptions/HttpException";
 import mongoose from "mongoose";
+import Chat from "../schemas/chat";
 
 export class ChatController {
     // public chatRoom = Container.get(ChatModel);
@@ -51,14 +52,14 @@ export class ChatController {
         const room = request.params.id;
         console.log(room);
         console.log(user_uniq_id);
-
-        io.to(room).emit("image", {
+        const chatdata = new Chat({
             sender: user_uniq_id || "default",
             room: request.params.id,
             sendAt: Date.now(),
             message: picDIRList,
             type: 1,
         });
+        io.to(room).emit("image", chatdata);
         response.status(200).json({
             status: 200,
             message: "전송 성공",
