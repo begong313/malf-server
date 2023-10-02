@@ -51,8 +51,9 @@ export class ChatController {
         const room = request.params.id;
         console.log(room);
         console.log(user_uniq_id);
+
         io.to(room).emit("chat", {
-            sender: user_uniq_id,
+            sender: user_uniq_id || "default",
             room: request.params.id,
             date: Date.now(),
             message: picDIRList,
