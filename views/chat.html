@@ -22,19 +22,15 @@
         {% endif %} {% endfor %}
     </div>
 </fieldset>
-<form action="/chat" id="chat-form" method="post" enctype="multipart/form-data">
-    <label for="gif">GIF 올리기</label>
-    <input type="file" id="gif" name="gif" accept="image/gif" />
-    <input type="text" id="chat" name="chat" />
-    <button type="submit">전송</button>
-</form>
+<button onclick="send">testtest</button>
 <script src="/chatTest/socket.io.js"></script>
 <script>
-    const socket = io.connect("http://localhost:8000/chat", {
+    const socket = io.connect("http://13.125.43.68:8000/chat", {
         path: "/chatTest",
     });
     const urlData = new URL(location).pathname.split("/").at(-1);
     console.log(urlData);
+
     socket.emit("join", urlData);
     socket.on("join", function (data) {
         console.log(data);
@@ -56,7 +52,13 @@
             chat: "sss",
         });
     });
-
+    function send() {
+        socket.emit("chat", {
+            room: urlData,
+            user: "test1",
+            chat: "sss",
+        });
+    }
     socket.on("image", function (data) {
         console.log(data);
     });

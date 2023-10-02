@@ -11,7 +11,7 @@ const mongoConnect = () => {
         mongoose.set("debug", true);
     }
     mongoose.connect(MONGO_URL, {
-        dbName: "gifchat",
+        dbName: "malfChat",
     });
 };
 
