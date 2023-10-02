@@ -56,7 +56,7 @@ export class ChatController {
             sender: user_uniq_id || "default",
             room: request.params.id,
             sendAt: Date.now(),
-            message: picDIRList,
+            message: JSON.stringify(picDIRList),
             type: 1,
         });
         io.to(room).emit("image", chatdata);
