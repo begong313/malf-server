@@ -70,7 +70,7 @@ function webSocket(server: any, app: express.Application) {
                 type: 2,
             });
 
-            chat.to(data).emit("join", chatdata);
+            chat.to(data.room).emit("join", chatdata);
         });
 
         socket.on("chat", async (data) => {
