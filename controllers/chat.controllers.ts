@@ -47,11 +47,8 @@ export class ChatController {
                 picDIRList.push(imageFiles[i].filename);
             }
         }
-        console.log("사진을 받았나?", picDIRList);
         const io = request.app.get("io").of("/chat");
         const room = request.params.id;
-        console.log(room);
-        console.log(user_uniq_id);
         const chatdata = new Chat({
             sender: user_uniq_id || "default",
             room: request.params.id,

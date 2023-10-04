@@ -65,12 +65,15 @@ function webSocket(server: any, app: express.Application) {
             const chatdata = new Chat({
                 room: data.room,
                 sender: data.sender || "notice",
+
+               
                 message: "방에 입장했습니다.",
                 sendAt: Date.now(),
                 type: 2,
             });
 
             chat.to(data.room).emit("join", chatdata);
+
         });
 
         socket.on("chat", async (data) => {

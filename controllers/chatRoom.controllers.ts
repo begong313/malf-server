@@ -5,6 +5,8 @@ import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
 import pool from "../lib/dbConnector";
+import Chat from "../schemas/chat";
+import mongoose from "mongoose";
 
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
@@ -171,6 +173,21 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
 
         try {
             await this.chatRoom.leaveChatRoom(post_id, user_uniq_id);
+
+            // 채팅방 나가기 메세지 전송
+            const io = request.app.get("io").of("/chat");
+            const room = request.params.id;
+            const chatdata = new Chat({
+                room: request.params.id,
+                sender: user_uniq_id || "default",
+                message: "가 나갔습니다.",
+                sendAt: Date.now(),
+                type: 2,
+            });
+            const collection = mongoose.connection.collection(room);
+            await collection.insertOne(chatdata);
+            io.to(room).emit("join", chatdata);
+
             response.status(200).json({
                 status: 200,
                 message: "채팅방 떠나기 성공",
