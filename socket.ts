@@ -61,33 +61,36 @@ function webSocket(server: any, app: express.Application) {
             console.log("방번호 ", data);
 
             // data는 방 id. Id값으로 방에 접속
-
             socket.join(data.room); // 네임스페이스 아래에 존재하는 방에 접속
             const chatdata = new Chat({
                 room: data.room,
                 sender: data.sender || "notice",
-                message: "님이 방에 입장했습니다.",
+
+               
+                message: "방에 입장했습니다.",
                 sendAt: Date.now(),
                 type: 2,
             });
-            socket.to(data).emit("join", chatdata);
+
+            chat.to(data.room).emit("join", chatdata);
+
         });
 
         socket.on("chat", async (data) => {
             try {
                 //todo :  mysql로 가서 채팅방이 존재하는지 검사해야함
-                const chat = new Chat({
+                const chatdata = new Chat({
                     room: data.room,
-                    sender: data.user,
-                    message: data.chat,
+                    sender: data.sender,
+                    message: data.message,
                     sendAt: Date.now(),
                     type: 0,
                 });
 
                 const collection = mongoose.connection.collection(data.room);
-                await collection.insertOne(chat);
-
-                socket.to(data.room).emit("chat", chat);
+                await collection.insertOne(chatdata);
+                console.log(chatdata);
+                chat.to(data.room).emit("chat", chatdata);
             } catch (err) {
                 console.log(err);
             }
