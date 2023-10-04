@@ -4,5 +4,7 @@
     - chat
       -image
 2. socket쪽 코드정리
-3. Console.log 지우고 Log로 만들기
-4.
+3. 각종 권한 관리
+    - User info -본인정보인지/아닌지
+4. Console.log 지우고 Log로 만들기
+5.

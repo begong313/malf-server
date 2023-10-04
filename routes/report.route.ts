@@ -14,9 +14,11 @@ export class ReportRouter implements Routes {
     }
 
     private initializeRoutes() {
-        // 첫 실행시 유저정보 등록창
+        // 글 신고
         this.router.post("/post", this.report.reportPost);
+        // 유저 신고
         this.router.post("/user", this.report.reportUser);
+        // 채팅 신고
         this.router.post("/chat", this.report.reportChat);
     }
 }
