@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 
 import Container from "typedi";
-import { UserInfoModel } from "../models/userInfo.model";
+import { UserModel } from "../models/user.model";
 
-export class UserInfoController {
-    public userInfo = Container.get(UserInfoModel);
-    public firstSetInfo = async (request: Request, response: Response) => {
+export class UserController {
+    public userInfo = Container.get(UserModel);
+    public firstSetProfile = async (request: Request, response: Response) => {
         try {
             // 전처리 부분 따로 빼야함.
             const requiredInfo = {
@@ -55,7 +55,7 @@ export class UserInfoController {
         }
     };
 
-    public updateUserInfo = async (request: Request, response: Response) => {
+    public updateUserProfile = async (request: Request, response: Response) => {
         const user_uniq_id: string = response.locals.decoded;
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
@@ -113,7 +113,7 @@ export class UserInfoController {
         });
     };
 
-    public getUserInfo = async (request: Request, response: Response) => {
+    public getUserProfile = async (request: Request, response: Response) => {
         const request_user_id = response.locals.decoded;
         const target_user_id = request.params.id;
 
@@ -121,7 +121,7 @@ export class UserInfoController {
             //자기 자신의 정보를 가져올 때 , 남의 정보일 때 다르게 해야할듯
             //Todo
         }
-        const rows = await this.userInfo.getUserInfo(target_user_id);
+        const rows = await this.userInfo.getUserProfile(target_user_id);
         response.status(200).json({
             status: 200,
             data: rows,

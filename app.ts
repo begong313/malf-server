@@ -5,7 +5,7 @@ import { ChatRouter } from "./routes/chat.route";
 import { ChatRoomRouter } from "./routes/chatRoom.route";
 import { PictureRouter } from "./routes/picture.route";
 import { TestRoute } from "./routes/test.route";
-import { UserInfoRouter } from "./routes/userInfo.route";
+import { UserRouter } from "./routes/user.route";
 import { Server } from "./Server";
 import webSocket from "./socket";
 
@@ -13,7 +13,7 @@ try {
     const app = new Server([
         new AuthRoute(),
         new AdRoute(),
-        new UserInfoRouter(),
+        new UserRouter(),
         new BulletinBoardRouter(),
         new ChatRoomRouter(),
         new TestRoute(),

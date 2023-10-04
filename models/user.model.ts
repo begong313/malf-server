@@ -3,7 +3,7 @@ import pool from "../lib/dbConnector";
 import { FieldPacket, RowDataPacket } from "mysql2";
 
 @Service()
-export class UserInfoModel {
+export class UserModel {
     public setRequiredInfo = async (requiredInfo: any) => {
         const query: string = this.getSetRequiredInfoQuery();
         const values = [
@@ -89,10 +89,10 @@ export class UserInfoModel {
         return rows;
     };
 
-    public getUserInfo = async (
+    public getUserProfile = async (
         user_uniq_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getGetUserInfoQuery();
+        const query: string = this.getGetUserProfileQuery();
         const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
             query,
             [user_uniq_id]
@@ -140,7 +140,7 @@ export class UserInfoModel {
         return query;
     }
 
-    private getGetUserInfoQuery(): string {
+    private getGetUserProfileQuery(): string {
         const query: string =
             "select i.user_uniq_id, i.status as user_status, \
             r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, \
