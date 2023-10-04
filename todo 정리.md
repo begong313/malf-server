@@ -7,4 +7,4 @@
 3. 각종 권한 관리
     - User info -본인정보인지/아닌지
 4. Console.log 지우고 Log로 만들기
-5.
+5. model쪽 any인것들 Interface로 type만들기
