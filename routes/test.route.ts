@@ -20,19 +20,6 @@ export class TestRoute implements Routes {
                 response.send("sss");
             }
         });
-        this.router.get("/", async (request: Request, response: Response) => {
-            try {
-                const [rooms]: [RowDataPacket[], FieldPacket[]] =
-                    await pool.execute(
-                        "SELECT title as title, user_uniq_id as owner, capacity_local as max  FROM post"
-                    );
-                console.log(rooms);
-                response.render("main", { rooms });
-            } catch (err) {
-                console.log(err);
-                response.send("error");
-            }
-        });
 
         this.router.get(
             "/enter/:id",
