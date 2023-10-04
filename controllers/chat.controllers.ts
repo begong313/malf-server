@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { HttpException } from "../exeptions/HttpException";
 import mongoose from "mongoose";
+import Chat from "../schemas/chat";
 
 export class ChatController {
     // public chatRoom = Container.get(ChatModel);
@@ -37,6 +38,7 @@ export class ChatController {
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
         if (imageFiles == undefined) {
+            console.log("사진못받음");
             next(new HttpException(400, "사진을 첨부해주세요"));
             return;
         } else {
@@ -45,14 +47,18 @@ export class ChatController {
                 picDIRList.push(imageFiles[i].filename);
             }
         }
-        console.log("사진을 받았나?", picDIRList);
         const io = request.app.get("io").of("/chat");
-        io.to(request.params.id).emit("image", {
-            sender: user_uniq_id,
+        const room = request.params.id;
+        const chatdata = new Chat({
+            sender: user_uniq_id || "default",
             room: request.params.id,
-            date: Date.now(),
-            message: picDIRList,
+            sendAt: Date.now(),
+            message: JSON.stringify(picDIRList),
+            type: 1,
         });
+        const collection = mongoose.connection.collection(room);
+        await collection.insertOne(chatdata);
+        io.to(room).emit("image", chatdata);
         response.status(200).json({
             status: 200,
             message: "전송 성공",

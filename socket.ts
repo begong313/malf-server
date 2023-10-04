@@ -61,11 +61,16 @@ function webSocket(server: any, app: express.Application) {
             console.log("방번호 ", data);
 
             // data는 방 id. Id값으로 방에 접속
-            socket.join(data); // 네임스페이스 아래에 존재하는 방에 접속
-            socket.to(data).emit("join", {
-                user: "system",
-                chat: `${data}에 입장하셨습니다.`,
+
+            socket.join(data.room); // 네임스페이스 아래에 존재하는 방에 접속
+            const chatdata = new Chat({
+                room: data.room,
+                sender: data.sender || "notice",
+                message: "님이 방에 입장했습니다.",
+                sendAt: Date.now(),
+                type: 2,
             });
+            socket.to(data).emit("join", chatdata);
         });
 
         socket.on("chat", async (data) => {
