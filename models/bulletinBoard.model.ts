@@ -157,7 +157,7 @@ class BulletinBoardModel {
         (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
         (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
         from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
-        where post_id = :post_id ORDER BY post.post_id DESC`;
+        where post_id = :post_id ORDER BY post.post_id asc`;
         return query;
     }
     private getUserIDSearchQuery(): string {
