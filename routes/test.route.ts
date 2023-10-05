@@ -1,7 +1,5 @@
 import express, { Request, Response } from "express";
 import { Routes } from "../interfaces/routes.interface";
-import pool from "../lib/dbConnector";
-import { FieldPacket, RowDataPacket } from "mysql2";
 
 export class TestRoute implements Routes {
     public path = "/test";
@@ -30,5 +28,28 @@ export class TestRoute implements Routes {
                 return response.render("chat", {});
             }
         );
+        this.router.get("/chat", async (request, response) => {
+            const io = request.app.get("io").of("/chat");
+
+            io.to("1").emit("chat", {
+                user: "test1",
+                chat: "sdfsdfs",
+                date: Date.now(),
+            });
+
+            return response.send("Sdfs");
+        });
+
+        this.router.get("/mdb", async (request, response) => {
+            const io = request.app.get("io").of("/chat");
+
+            io.to("23").emit("test", {
+                user: "test11",
+                chat: "sdfsdfs",
+                date: Date.now(),
+            });
+
+            return response.send("Sdfs");
+        });
     }
 }
