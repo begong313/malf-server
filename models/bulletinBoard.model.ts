@@ -139,7 +139,7 @@ class BulletinBoardModel {
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
-        Limit ? offset ?`;
+        Limit ? offset ? ORDER BY post.post_id desc`;
         return query;
     }
     private getCreateQuery(): string {
@@ -157,7 +157,7 @@ class BulletinBoardModel {
         (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
         (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
         from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
-        where post_id = :post_id ORDER BY post.post_id asc`;
+        where post_id = :post_id `;
         return query;
     }
     private getUserIDSearchQuery(): string {
