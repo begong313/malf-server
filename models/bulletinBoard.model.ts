@@ -138,8 +138,8 @@ class BulletinBoardModel {
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id
-        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id 
-        ORDER BY post.post_id DESC Limit ? offset ? `;
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id desc
+        Limit ? offset ? `;
         return query;
     }
     private getCreateQuery(): string {
