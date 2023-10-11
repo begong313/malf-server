@@ -22,7 +22,7 @@ export class ReportController {
     public reportUser = async (request: Request, response: Response) => {
         const report_data = {
             user_uniq_id: response.locals.decoded,
-            reported_id: request.body.reported_user_uniq_id,
+            reported_id: request.body.user_uniq_id,
             report_info: request.body.report_info,
             report_email: request.body.report_email,
         };

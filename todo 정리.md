@@ -8,3 +8,4 @@
     - User info -본인정보인지/아닌지
 4. Console.log 지우고 Log로 만들기
 5. model쪽 any인것들 Interface로 type만들기
+6. post_list orderby를 날짜로하기 (지금은 id 순으로 가져옴 . 나중가면 부정확할듯)
