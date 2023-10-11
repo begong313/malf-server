@@ -21,7 +21,11 @@ export class UserController {
             const imageFiles: any = request.files;
             var picDIRList: string[] = []; //사진 경로 담을 array
             //첨부사진이 없을 때
-            if (imageFiles.length == 0) {
+            if (
+                imageFiles == null ||
+                imageFiles == undefined ||
+                imageFiles.length == 0
+            ) {
                 picDIRList.push("default.jpeg");
             } else {
                 //사진 dir정보

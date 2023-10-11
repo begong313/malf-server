@@ -144,7 +144,7 @@ export class UserModel {
         const query: string =
             "select i.user_uniq_id, i.status as user_status, \
             r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, \
-            a.description, a.interests, a.profile_pic, a.updated_at \
+            a.description, a.interests, a.profile_pic, a.able_language as able_language, a.updated_at \
             from user_id as i join user_require_info as r on i.user_uniq_id = r.user_uniq_id join user_additional_info as a on i.user_uniq_id = a.user_uniq_id\
             where i.user_uniq_id = ?";
         return query;
