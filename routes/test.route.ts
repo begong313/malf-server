@@ -43,7 +43,7 @@ export class TestRoute implements Routes {
         this.router.get("/mdb", async (request, response) => {
             const io = request.app.get("io").of("/chat");
 
-            io.to("23").emit("test", {
+            io.to("23").emit("chat", {
                 user: "test11",
                 chat: "sdfsdfs",
                 date: Date.now(),

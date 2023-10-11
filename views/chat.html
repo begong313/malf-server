@@ -25,13 +25,13 @@
 <button onclick="send()">testtest</button>
 <script src="/chatTest/socket.io.js"></script>
 <script>
-    const socket = io.connect("http://13.125.43.68:8000/chat", {
+    const socket = io.connect("http://localhost:8000/chat", {
         path: "/chatTest",
     });
     const urlData = new URL(location).pathname.split("/").at(-1);
     console.log(urlData);
 
-    socket.emit("join", urlData);
+    socket.emit("join", { room: urlData, sender: "test1" });
     socket.on("join", function (data) {
         console.log(data);
         const div = document.createElement("div");
@@ -42,21 +42,23 @@
         document.querySelector("#chat-list").appendChild(div);
     });
     socket.on("chat", function (data) {
+        console.log("Dfasdfs");
         console.log(data);
     });
     socket.on("test", function (data) {
         console.log("서버로 chat 전송");
         socket.emit("chat", {
             room: urlData,
-            user: "test1",
-            chat: "sss",
+            sender: "test1",
+            message: "dfsd",
         });
     });
     function send() {
+        console.log("보냄");
         socket.emit("chat", {
             room: urlData,
-            user: "test1",
-            chat: "sss",
+            sender: "test1",
+            message: "dfsd",
         });
     }
     socket.on("image", function (data) {
