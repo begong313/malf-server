@@ -20,13 +20,11 @@ export class BulletinBoardController {
         console.log(this.bulletinBoard);
         const page: number = Number(request.query.page) || 1;
         const limit: number = Number(request.query.limit) || 100;
-        const category: string | null = String(request.query.category) || null;
-        console.log("category", category);
-        var rows: RowDataPacket[] = await this.bulletinBoard.loadPostList(
-            page,
-            limit
-        );
-        if (category == undefined) {
+        const category: any = request.query.category || null;
+
+        var rows: RowDataPacket[];
+        if (category == undefined || category == null) {
+            console.log("category undefined");
             rows = await this.bulletinBoard.loadPostList(page, limit);
         } else {
             rows = await this.bulletinBoard.loadPostListWithCategory(
