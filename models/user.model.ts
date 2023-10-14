@@ -100,6 +100,16 @@ export class UserModel {
         return rows;
     };
 
+    public setStudentID = async (user_uniq_id: string, studentID: any) => {
+        const query: string = this.getSetStudentIDQuery();
+        try {
+            const values = [studentID, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     private getSetRequiredInfoQuery(): string {
         const query: string =
             "insert into user_require_info (user_uniq_id, user_type, nation, gender, nickname, birthday, default_language) values (?,?,?,?,?,?,?)";
@@ -141,12 +151,16 @@ export class UserModel {
     }
 
     private getGetUserProfileQuery(): string {
+        const query: string = `select i.user_uniq_id, i.status as user_status, i.user_temperature as user_temperature,
+            r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, 
+            a.description, a.interests, a.profile_pic, a.able_language as able_language, a.updated_at 
+            from user_id as i join user_require_info as r on i.user_uniq_id = r.user_uniq_id join user_additional_info as a on i.user_uniq_id = a.user_uniq_id
+            where i.user_uniq_id = ?`;
+        return query;
+    }
+    private getSetStudentIDQuery(): string {
         const query: string =
-            "select i.user_uniq_id, i.status as user_status, \
-            r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, \
-            a.description, a.interests, a.profile_pic, a.able_language as able_language, a.updated_at \
-            from user_id as i join user_require_info as r on i.user_uniq_id = r.user_uniq_id join user_additional_info as a on i.user_uniq_id = a.user_uniq_id\
-            where i.user_uniq_id = ?";
+            "update user_id set  student_id = ?, status = '1'  where user_uniq_id = ? ";
         return query;
     }
 }

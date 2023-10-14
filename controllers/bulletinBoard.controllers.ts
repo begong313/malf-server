@@ -20,12 +20,21 @@ export class BulletinBoardController {
         console.log(this.bulletinBoard);
         const page: number = Number(request.query.page) || 1;
         const limit: number = Number(request.query.limit) || 100;
-
-        console.log(await this.bulletinBoard.loadPostList(page, limit));
-        const rows: RowDataPacket[] = await this.bulletinBoard.loadPostList(
+        const category: string | null = String(request.query.category) || null;
+        console.log("category", category);
+        var rows: RowDataPacket[] = await this.bulletinBoard.loadPostList(
             page,
             limit
         );
+        if (category == undefined) {
+            rows = await this.bulletinBoard.loadPostList(page, limit);
+        } else {
+            rows = await this.bulletinBoard.loadPostListWithCategory(
+                page,
+                limit,
+                category
+            );
+        }
 
         response.status(200).json({
             status: 200,
@@ -235,7 +244,25 @@ export class BulletinBoardController {
             next(new HttpException(400, "좋아요 처리 에러"));
         }
     };
-
+    public changeStatus = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const post_id: string = request.params.id;
+        //해당 글의 작성자인지 확인
+        const rows = await this.bulletinBoard.userIDSearch(post_id);
+        if (rows[0].user_uniq_id != user_uniq_id) {
+            next(new HttpException(401, "권한이 없습니다"));
+            return;
+        }
+        await this.bulletinBoard.changeStatus(post_id);
+        response.status(200).json({
+            status: 200,
+            message: "글상태 마감 변경 성공",
+        });
+    };
     /*todos
     1. 주석
     2. 좋아요 누름과 동시에 Db에서 글이 삭제될때 lock

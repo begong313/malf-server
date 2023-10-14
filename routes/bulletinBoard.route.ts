@@ -41,6 +41,9 @@ export class BulletinBoardRouter implements Routes {
 
         //좋아요 클릭
         this.router.post(`/posts/:id/like`, this.bulletinBoard.pushLike);
+
+        //글 status 변경
+        this.router.post("/posts/:id/status", this.bulletinBoard.changeStatus);
     }
 }
 

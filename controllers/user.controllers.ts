@@ -131,4 +131,36 @@ export class UserController {
             data: rows,
         });
     };
+
+    public setStudentID = async (request: Request, response: Response) => {
+        const imageFiles: any = request.files;
+        const user_uniq_id: string = response.locals.decoded;
+        var picDIRList: string[] = []; //사진 경로 담을 array
+        //첨부사진이 없을 때
+        if (
+            imageFiles == null ||
+            imageFiles == undefined ||
+            imageFiles.length == 0
+        ) {
+            response.status(400).json({
+                status: 400,
+                message: "사진이 없습니다.",
+            });
+        } else {
+            //사진 dir정보
+            for (var i = 0; i < imageFiles.length; i++) {
+                picDIRList.push(imageFiles[i].filename);
+            }
+        }
+
+        await this.userInfo.setStudentID(
+            user_uniq_id,
+            JSON.stringify(picDIRList)
+        );
+
+        response.status(200).json({
+            status: 200,
+            message: "학생증 등록 성공",
+        });
+    };
 }

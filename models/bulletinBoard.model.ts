@@ -18,6 +18,22 @@ class BulletinBoardModel {
         );
         return rows;
     };
+
+    //category_id를 받아서 해당 카테고리의 게시글을 가져옴
+    public loadPostListWithCategory = async (
+        page: number,
+        limit: number,
+        category: string
+    ): Promise<RowDataPacket[]> => {
+        const query: string = this.getLoadPostListWithCategoryQuery();
+        const values = [category, String(limit), String((page - 1) * limit)];
+        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+            query,
+            values
+        );
+        return rows;
+    };
+
     public createPost = async (postBody: any): Promise<number> => {
         const query: string = this.getCreateQuery();
         const values = [
@@ -133,15 +149,39 @@ class BulletinBoardModel {
         await pool.execute(query, values);
     };
 
+    public changeStatus = async (post_id: string): Promise<void> => {
+        const query: string = this.getChangeStatusQuery();
+        const values = [post_id];
+        await pool.execute(query, values);
+    };
+
     private getLoadPostListQuery(): string {
         const query: string = `select post.post_id, post.title, user_require_info.nickname as author_nickname,
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
-        post.start_time as meeting_start_time , post.user_uniq_id
-        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id order by post.post_id desc
+        post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category,
+        (select count(*) from post_like where post_id = post.post_id )as like_count
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
+        where post.post_status = 1
+        order by post.post_id desc
         Limit ? offset ? `;
         return query;
     }
+
+    //현재는 마감된 글은 리스트에 안보임, post_status항목을 조절해서 컨트롤 가능할듯
+    private getLoadPostListWithCategoryQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nickname as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time , post.user_uniq_id,post.category_id as category,
+        (select count(*) from post_like where post_id = post.post_id )as like_count
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
+        where post.category_id = ? and post.post_status = 1
+        order by post.post_id desc
+        Limit ? offset ? `;
+        return query;
+    }
+
     private getCreateQuery(): string {
         const query: string =
             "insert into post (title, content, picture, capacity_local,capacity_travel, location, start_time, user_uniq_id, category_id) values(?,?,?,?,?,?,?,?,?)";
@@ -152,7 +192,7 @@ class BulletinBoardModel {
         post.post_id, post.title, post.content, user_require_info.nickname as author_nickname,
         user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic, post.location as meeting_location,
-        post.start_time as meeting_start_time, post.category_id as category, post.user_uniq_id,
+        post.start_time as meeting_start_time, post.category_id as category, post.user_uniq_id, post.post_status as post_status,
         (select count(*) from post_like where post_id = :post_id )as like_count,
         (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
         (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
@@ -184,6 +224,11 @@ class BulletinBoardModel {
     }
     private getDeleteLikeQuert(): string {
         const query: string = `delete from post_like where post_id = ? and user_uniq_id = ?`;
+        return query;
+    }
+    //글 status 변경 query
+    private getChangeStatusQuery(): string {
+        const query: string = `update post set post_status = 2 where post_id = ?`;
         return query;
     }
 }

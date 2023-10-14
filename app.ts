@@ -4,6 +4,7 @@ import { BulletinBoardRouter } from "./routes/bulletinBoard.route";
 import { ChatRouter } from "./routes/chat.route";
 import { ChatRoomRouter } from "./routes/chatRoom.route";
 import { PictureRouter } from "./routes/picture.route";
+import { ReviewRouter } from "./routes/review.route";
 import { TestRoute } from "./routes/test.route";
 import { UserRouter } from "./routes/user.route";
 import { Server } from "./Server";
@@ -19,6 +20,7 @@ try {
         new TestRoute(),
         new PictureRouter(),
         new ChatRouter(),
+        new ReviewRouter(),
     ]);
     const server = app.listen();
     webSocket(server, app.app);
