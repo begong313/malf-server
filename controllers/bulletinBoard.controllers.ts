@@ -8,6 +8,7 @@ import { HttpException } from "../exeptions/HttpException";
 import BulletinBoardModel from "../models/bulletinBoard.model";
 import { Container } from "typedi";
 import mongoose from "mongoose";
+import StatusChecker from "../lib/statusChecker";
 
 export class BulletinBoardController {
     public bulletinBoard = Container.get(BulletinBoardModel);
@@ -146,15 +147,23 @@ export class BulletinBoardController {
                 picDIRList: JSON.stringify(picDIRList),
             };
 
-            const rows = await this.bulletinBoard.userIDSearch(post_id);
-            if (rows.length == 0) {
-                next(new HttpException(404, "없는 글입니다."));
-                return;
+            //user status code 확인
+            const userStatusCode: number = await StatusChecker.getStatus(
+                user_uniq_id
+            );
+            //superuser일 경우 pass
+            if (userStatusCode != 100) {
+                const rows = await this.bulletinBoard.userIDSearch(post_id);
+                if (rows.length == 0) {
+                    next(new HttpException(404, "없는 글입니다."));
+                    return;
+                }
+                if (rows[0].user_uniq_id != user_uniq_id) {
+                    next(new HttpException(401, "권한이 없습니다"));
+                    return;
+                }
             }
-            if (rows[0].user_uniq_id != user_uniq_id) {
-                next(new HttpException(401, "권한이 없습니다"));
-                return;
-            }
+
             const updated_post_id: number = await this.bulletinBoard.updatePost(
                 post_id,
                 postBody
@@ -183,16 +192,21 @@ export class BulletinBoardController {
         const user_uniq_id: string = response.locals.decoded;
 
         try {
-            const rows = await this.bulletinBoard.userIDSearch(post_id);
-            if (rows.length == 0) {
-                next(new HttpException(404, "없는 글입니다."));
-                return;
+            //user status code 확인
+            const userStatusCode: number = await StatusChecker.getStatus(
+                user_uniq_id
+            );
+            if (userStatusCode != 100) {
+                const rows = await this.bulletinBoard.userIDSearch(post_id);
+                if (rows.length == 0) {
+                    next(new HttpException(404, "없는 글입니다."));
+                    return;
+                }
+                if (rows[0].user_uniq_id != user_uniq_id) {
+                    next(new HttpException(401, "권한이 없습니다"));
+                    return;
+                }
             }
-            if (rows[0].user_uniq_id != user_uniq_id) {
-                next(new HttpException(401, "권한이 없습니다"));
-                return;
-            }
-
             this.bulletinBoard.deletePost(post_id);
 
             //글 삭제되면 Chat db 삭제되게 임시로
@@ -250,10 +264,18 @@ export class BulletinBoardController {
         const user_uniq_id = response.locals.decoded;
         const post_id: string = request.params.id;
         //해당 글의 작성자인지 확인
-        const rows = await this.bulletinBoard.userIDSearch(post_id);
-        if (rows[0].user_uniq_id != user_uniq_id) {
-            next(new HttpException(401, "권한이 없습니다"));
-            return;
+
+        //user status code 확인
+        const userStatusCode: number = await StatusChecker.getStatus(
+            user_uniq_id
+        );
+
+        if (userStatusCode != 100) {
+            const rows = await this.bulletinBoard.userIDSearch(post_id);
+            if (rows[0].user_uniq_id != user_uniq_id) {
+                next(new HttpException(401, "권한이 없습니다"));
+                return;
+            }
         }
         await this.bulletinBoard.changeStatus(post_id);
         response.status(200).json({
