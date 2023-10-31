@@ -16,7 +16,7 @@ const chatSchema = new mongoose.Schema({
         default: Date.now,
     },
 
-    // 0 : text, 1 : image, 2: 방입장,퇴장 공지
+    // 0 : text, 1 : image, 2: 방입장 , 3:퇴장 공지
     type: {
         type: Number,
         default: 0,

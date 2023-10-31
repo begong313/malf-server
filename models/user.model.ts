@@ -110,6 +110,57 @@ export class UserModel {
         }
     };
 
+    public getLikeList = async (
+        user_uniq_id: string,
+        page: number,
+        limit: number
+    ) => {
+        const query: string = this.getGetLikeListQuery();
+        try {
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [user_uniq_id, String(limit), String((page - 1) * limit)]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    public getWriteList = async (
+        user_uniq_id: string,
+        page: number,
+        limit: number
+    ) => {
+        const query: string = this.getGetWriteListQuery();
+        try {
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [user_uniq_id, String(limit), String((page - 1) * limit)]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    public getApplyList = async (
+        user_uniq_id: string,
+        page: number,
+        limit: number
+    ) => {
+        const query: string = this.getGetApplyListQuery();
+        try {
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [user_uniq_id, String(limit), String((page - 1) * limit)]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     private getSetRequiredInfoQuery(): string {
         const query: string =
             "insert into user_require_info (user_uniq_id, user_type, nation, gender, nickname, birthday, default_language) values (?,?,?,?,?,?,?)";
@@ -151,11 +202,53 @@ export class UserModel {
     }
 
     private getGetUserProfileQuery(): string {
-        const query: string = `select i.user_uniq_id, i.status as user_status, i.user_temperature as user_temperature,
-            r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, 
-            a.description, a.interests, a.profile_pic, a.able_language as able_language, a.updated_at 
-            from user_id as i join user_require_info as r on i.user_uniq_id = r.user_uniq_id join user_additional_info as a on i.user_uniq_id = a.user_uniq_id
-            where i.user_uniq_id = ?`;
+        const query: string =
+            "select i.user_uniq_id, i.status as user_status, \
+            r.user_type, r.nation, r.gender, r.nickname, r.birthday, r.default_language, r.created_at, \
+            a.description, a.interests, a.profile_pic, a.updated_at \
+            from user_id as i join user_require_info as r on i.user_uniq_id = r.user_uniq_id join user_additional_info as a on i.user_uniq_id = a.user_uniq_id\
+            where i.user_uniq_id = ?";
+        return query;
+    }
+
+    private getGetLikeListQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nickname as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category, 
+        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
+        join post_like on post.post_id = post_like.post_id 
+        where post_like.user_uniq_id = ?
+        order by post.post_id desc
+        Limit ? offset ?
+        `;
+        return query;
+    }
+
+    private getGetWriteListQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nickname as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category,
+        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
+        where post.user_uniq_id = ?
+        order by post.post_id desc
+        Limit ? offset ? `;
+        return query;
+    }
+
+    private getGetApplyListQuery(): string {
+        const query: string = `select post.post_id, post.title, user_require_info.nickname as author_nickname,
+        user_require_info.nation as author_nation, user_require_info.user_type as user_type,
+        post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
+        post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category,
+        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status
+        from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id join post_want_join on post.post_id = post_want_join.post_id 
+        where post_want_join.user_uniq_id = ?
+        order by post.post_id desc
+        Limit ? offset ? `;
         return query;
     }
     private getSetStudentIDQuery(): string {

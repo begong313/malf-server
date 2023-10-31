@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import Container from "typedi";
 import { UserModel } from "../models/user.model";
@@ -21,11 +21,7 @@ export class UserController {
             const imageFiles: any = request.files;
             var picDIRList: string[] = []; //사진 경로 담을 array
             //첨부사진이 없을 때
-            if (
-                imageFiles == null ||
-                imageFiles == undefined ||
-                imageFiles.length == 0
-            ) {
+            if (imageFiles.length == 0) {
                 picDIRList.push("default.jpeg");
             } else {
                 //사진 dir정보
@@ -161,6 +157,51 @@ export class UserController {
         response.status(200).json({
             status: 200,
             message: "학생증 등록 성공",
+        });
+    };
+
+    public getLikeList = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = request.params.id;
+        const page: number = Number(request.query.page) || 1;
+        const limit: number = Number(request.query.limit) || 100;
+        const rows = await this.userInfo.getLikeList(user_uniq_id, page, limit);
+        response.status(200).json({
+            status: 200,
+            data: rows,
+        });
+    };
+
+    public getWriteList = async (request: Request, response: Response) => {
+        const user_uniq_id = request.params.id;
+        const page: number = Number(request.query.page) || 1;
+        const limit: number = Number(request.query.limit) || 100;
+        const rows = await this.userInfo.getWriteList(
+            user_uniq_id,
+            page,
+            limit
+        );
+        response.status(200).json({
+            status: 200,
+            data: rows,
+        });
+    };
+
+    public getApplyList = async (request: Request, response: Response) => {
+        const user_uniq_id = request.params.id;
+        const page: number = Number(request.query.page) || 1;
+        const limit: number = Number(request.query.limit) || 100;
+        const rows = await this.userInfo.getApplyList(
+            user_uniq_id,
+            page,
+            limit
+        );
+        response.status(200).json({
+            status: 200,
+            data: rows,
         });
     };
 }
