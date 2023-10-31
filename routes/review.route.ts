@@ -14,7 +14,7 @@ export class ReviewRouter implements Routes {
     }
 
     private initializeRoutes() {
-        // 첫 실행시 유저정보 등록
+        // 글 신고
         this.router.post("/user", this.review.reviewUser);
     }
 }
