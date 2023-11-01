@@ -153,6 +153,7 @@ export class UserController {
             user_uniq_id,
             JSON.stringify(picDIRList)
         );
+        await this.userInfo.setUserStatus(user_uniq_id, 0);
 
         response.status(200).json({
             status: 200,

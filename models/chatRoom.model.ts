@@ -4,6 +4,7 @@ import { Service } from "typedi";
 
 @Service()
 export class ChatRoomModel {
+    //채팅방 참가 신청
     public wantJoinChatRoom = async (
         post_id: string,
         user_uniq_id: string
@@ -13,6 +14,7 @@ export class ChatRoomModel {
         await pool.execute(query, values);
     };
 
+    //참가신청 취소
     public cancelJoinChatRoom = async (
         post_id: string,
         user_uniq_id: string
@@ -26,6 +28,7 @@ export class ChatRoomModel {
         return data;
     };
 
+    //참가 목록 받아오기
     public loadEnterRequestChatRoom = async (
         post_id: string
     ): Promise<RowDataPacket[]> => {
@@ -116,11 +119,17 @@ export class ChatRoomModel {
         return query;
     }
     private getLoadEnterRequestQuery() {
-        const query: string = `select * from post_want_join join user_require_info on post_want_join.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
+        const query: string = `select pwj.user_uniq_id as user_uniq_id, uri.user_type as user_type, uri.nation as nation, uri.nickname as nick_name,
+        uri.birthday as birthday, uri.default_language as default_language ,uai.profile_pic as profile_pic 
+        from post_want_join as pwj join user_require_info as uri on pwj.user_uniq_id = uri.user_uniq_id join user_additional_info as uai on pwj.user_uniq_id = uai.user_uniq_id 
+        where post_id = ?`;
         return query;
     }
     private getLoadChatMemberQuery(): string {
-        const query: string = `select * from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id = ?`;
+        const query: string = `select pp.user_uniq_id as user_uniq_id, uri.user_type as user_type, uri.nation as nation, uri.nickname as nick_name,
+        uri.birthday as birthday, uri.default_language as default_language ,uai.profile_pic as profile_pic 
+        from post_participation as pp join user_require_info as uri on pp.user_uniq_id = uri.user_uniq_id join user_additional_info as uai on pwj.user_uniq_id = uai.user_uniq_id 
+        where post_id = ?`;
         return query;
     }
     private getLoadMyChatRoomsQuery(): string {

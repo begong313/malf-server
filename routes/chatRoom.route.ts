@@ -36,9 +36,6 @@ export class ChatRoomRouter implements Routes {
             this.chatRoom.disagreeEnterChatroom
         );
 
-        //채팅방 입장
-        this.router.get(`/:id/chatroom`, this.chatRoom.enterChatRoom);
-
         //채팅방 나가기
         this.router.delete(`/:id/chatroom`, this.chatRoom.leaveChatroom);
 

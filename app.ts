@@ -6,7 +6,6 @@ import { ChatRoomRouter } from "./routes/chatRoom.route";
 import { PictureRouter } from "./routes/picture.route";
 import { ReportRouter } from "./routes/report.route";
 import { ReviewRouter } from "./routes/review.route";
-import { TestRoute } from "./routes/test.route";
 import { UserRouter } from "./routes/user.route";
 import { Server } from "./Server";
 import webSocket from "./socket";
@@ -18,7 +17,6 @@ try {
         new UserRouter(),
         new BulletinBoardRouter(),
         new ChatRoomRouter(),
-        new TestRoute(),
         new PictureRouter(),
         new ChatRouter(),
         new ReportRouter(),
