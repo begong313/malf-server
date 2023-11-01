@@ -7,13 +7,15 @@ import { ChatRoomModel } from "../models/chatRoom.model";
 import pool from "../lib/dbConnector";
 import Chat from "../schemas/chat";
 import mongoose from "mongoose";
+import RightChecker from "../lib/rightChecker";
 
 export class ChatRoomController {
     public chatRoom = Container.get(ChatRoomModel);
     /* 
-채팅방 참가 신청 
-todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
-*/
+    채팅방 참가 신청 
+    todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
+    todo : 정원이 다 차면 신청을 못하게 해야함
+    */
     public wantJoinChatroom = async (
         request: Request,
         response: Response,
@@ -34,9 +36,9 @@ todo : ?? 이미 채팅방에 입장한 상태라면 에러 띄우기
     };
 
     /*
-입장 신청 취소(철회)
-Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lock을 사용해야 할듯)
-*/
+    입장 신청 취소(철회)
+    Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lock을 사용해야 할듯)
+    */
     public cancelJoinChatroom = async (
         request: Request,
         response: Response,
@@ -62,9 +64,8 @@ Todo : 만약 입장요청 취소와 승인이 동시에 이루어진다면? (Lo
     };
 
     /*
-채팅방 참가요청 리스트 불러오기
-todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을 보내줄것인지 정하기
-*/
+    채팅방 참가요청 리스트 불러오기
+    */
     public loadEnterRequestChatroom = async (
         request: Request,
         response: Response,
@@ -74,8 +75,13 @@ todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을
         const user_uniq_id = response.locals.decoded;
 
         try {
+            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+                next(new HttpException(401, "권한이 없습니다"));
+                return;
+            }
             const rows: RowDataPacket[] =
                 await this.chatRoom.loadEnterRequestChatRoom(post_id);
+
             response.status(200).json({
                 status: 200,
                 data: rows,
@@ -86,9 +92,8 @@ todo : 불러오는 사람이 권한이 있는지 검사, 어떤 데이터들을
     };
 
     /* 
-채팅방 참가 승인 
-todo : 요청자가 승인 권한이 있는지 확인해야 함
-*/
+    채팅방 참가 승인 
+    */
     public agreeEnterChatroom = async (
         request: Request,
         response: Response,
@@ -99,8 +104,25 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
 
         try {
-            await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
+            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+                next(new HttpException(401, "권한이 없습니다"));
+                return;
+            }
+            // 채팅방 참가 메세지 전송
+            const io = request.app.get("io").of("/chat");
+            const room = request.params.id;
+            const chatdata = new Chat({
+                room: request.params.id,
+                sender: user_uniq_id || "default",
+                message: "enter",
+                sendAt: Date.now(),
+                type: 2,
+            });
+            const collection = mongoose.connection.collection(room);
+            await collection.insertOne(chatdata);
+            io.to(room).emit("join", chatdata);
 
+            await this.chatRoom.agreeEnterChatRoom(post_id, applicant_uniq_id);
             response.status(200).json({
                 status: 200,
                 message: "채팅방 입장 승인 성공",
@@ -111,9 +133,9 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         }
     };
 
-    /* 채팅방 입장 거절 
-todo : 요청자가 승인 권한이 있는지 확인해야 함
-*/
+    /* 
+    채팅방 입장 거절 
+    */
     public disagreeEnterChatroom = async (
         request: Request,
         response: Response,
@@ -124,10 +146,14 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
 
         if (request.query.user_uniq_id == undefined) {
-            next(new HttpException(400, "아이디를 찾을 수 업습니다."));
+            next(new HttpException(400, "아이디를 찾을 수 없습니다."));
         }
 
         try {
+            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+                next(new HttpException(401, "권한이 없습니다"));
+                return;
+            }
             await this.chatRoom.disagreeEnterChatRoom(
                 post_id,
                 applicant_uniq_id
@@ -139,27 +165,6 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
         } catch (err) {
             next(new HttpException(400, "채팅방 입장 거절 실패"));
         }
-    };
-    //채팅방 입장
-    public enterChatRoom = async (
-        request: Request,
-        response: Response,
-        next: NextFunction
-    ) => {
-        const [room]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            "select * from post where post_id = ?",
-            [request.params.id]
-        );
-
-        if (room.length == 0) {
-            next(new HttpException(404, "채팅방이 존재하지 않습니다."));
-            return;
-        }
-
-        const io = request.app.get("io");
-        const { rooms } = io.of("/chat").adapter;
-        console.log(rooms);
-        return response.send("Sdfs");
     };
 
     /* 채팅방 나가기*/
@@ -180,9 +185,9 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
             const chatdata = new Chat({
                 room: request.params.id,
                 sender: user_uniq_id || "default",
-                message: "가 나갔습니다.",
+                message: "leave",
                 sendAt: Date.now(),
-                type: 2,
+                type: 3,
             });
             const collection = mongoose.connection.collection(room);
             await collection.insertOne(chatdata);
@@ -198,9 +203,9 @@ todo : 요청자가 승인 권한이 있는지 확인해야 함
     };
 
     /*
-채팅방 맴버 가져오기 
-todo : 어떤 정보를 가져올지 정해야됨
-*/
+    채팅방 맴버 가져오기 
+    todo : 채팅에 참여한 사람만 가져올수있게?
+    */
     public loadChatMembers = async (
         request: Request,
         response: Response,

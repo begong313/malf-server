@@ -76,15 +76,6 @@ class BulletinBoardModel {
         return rows;
     };
 
-    public userIDSearch = async (post_id: string): Promise<RowDataPacket[]> => {
-        const query: string = this.getUserIDSearchQuery();
-        const values = [post_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
-    };
     public updatePost = async (
         post_id: string,
         postBody: any
@@ -160,10 +151,12 @@ class BulletinBoardModel {
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category, post.post_status as post_status,
-        (select count(*) from post_like where post_id = post.post_id )as like_count
+        (select count(*) from post_like where post_id = post.post_id )as like_count,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 0 )as local_participation,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
         where post.post_status = 1
-        order by post.post_id desc
+        order by post.post_id desc;
         Limit ? offset ? `;
         return query;
     }
@@ -174,7 +167,9 @@ class BulletinBoardModel {
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id,post.category_id as category, post.post_status as post_status,
-        (select count(*) from post_like where post_id = post.post_id )as like_count
+        (select count(*) from post_like where post_id = post.post_id )as like_count,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 0 )as local_participation,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
         where post.category_id = ? and post.post_status = 1
         order by post.post_id desc
@@ -200,10 +195,7 @@ class BulletinBoardModel {
         where post_id = :post_id `;
         return query;
     }
-    private getUserIDSearchQuery(): string {
-        const query: string = "select user_uniq_id from post where post_id = ?";
-        return query;
-    }
+
     private getUpdateQuery(): string {
         const query: string =
             "update post set title = ?, content = ?, picture = ?, capacity_local = ?, capacity_travel= ?, location = ?, start_time = ?, category_id = ? where post_id = ?";

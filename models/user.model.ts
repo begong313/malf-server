@@ -161,6 +161,17 @@ export class UserModel {
         }
     };
 
+    //user status 변경
+    public setUserStatus = async (user_uniq_id: string, status: number) => {
+        const query: string = this.getSetUserStatusQuery();
+        try {
+            const values = [status, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     private getSetRequiredInfoQuery(): string {
         const query: string =
             "insert into user_require_info (user_uniq_id, user_type, nation, gender, nickname, birthday, default_language) values (?,?,?,?,?,?,?)";
@@ -251,9 +262,15 @@ export class UserModel {
         Limit ? offset ? `;
         return query;
     }
+
     private getSetStudentIDQuery(): string {
         const query: string =
             "update user_id set  student_id = ?, status = '1'  where user_uniq_id = ? ";
+        return query;
+    }
+
+    private getSetUserStatusQuery(): string {
+        const query: string = `"update user_id set status = ? where user_uniq_id = ?";`;
         return query;
     }
 }
