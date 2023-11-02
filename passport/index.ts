@@ -4,6 +4,7 @@ import passport from "passport";
 import kakao from "./kakaoStrategy";
 import local from "./localStrategy";
 import google from "./googleStrategy";
+import apple from "./appleStrategy";
 // import line from "./lineStrategy";
 
 function passportInit() {
@@ -11,6 +12,7 @@ function passportInit() {
     kakao();
     local();
     google();
+    apple();
     //line();
 }
 

@@ -224,6 +224,7 @@ export class ChatRoomController {
     };
 
     //참가한 채팅방 가져오기
+
     public loadMyChatRooms = async (
         request: Request,
         response: Response,
