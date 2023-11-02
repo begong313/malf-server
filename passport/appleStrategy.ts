@@ -9,14 +9,13 @@ function apple() {
         new Strategy(
             oauthConfig.apple,
             async (req, accessToken, refreshToken, idToken, profile, cb) => {
-                const user_uniq_id: string = await getUserUniqId(
-                    "apple",
-                    profile.id
-                );
-
-                //jwt 생성
-                const jwtToken = jwtGenerate(user_uniq_id);
-                return cb(null, jwtToken);
+                // const user_uniq_id: string = await getUserUniqId(
+                //     "apple",
+                //     profile.id
+                // );
+                // //jwt 생성
+                // const jwtToken = jwtGenerate(user_uniq_id);
+                // return cb(null, jwtToken);
             }
         )
     );
