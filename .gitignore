@@ -11,5 +11,6 @@ views/main.html
 views/index.html
 views/index1.html
 views/chat.html
+public/
 public/images
-public
+*.jpeg
