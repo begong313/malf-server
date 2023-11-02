@@ -156,7 +156,7 @@ class BulletinBoardModel {
         (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
         where post.post_status = 1
-        order by post.post_id desc;
+        order by post.post_id desc
         Limit ? offset ? `;
         return query;
     }

@@ -18,6 +18,13 @@ interface oauthConfig {
     line: {
         clientID: string;
     };
+    apple: {
+        clientID: string;
+        teamID: string;
+        callbackURL: string;
+        keyID: string;
+        privateKeyString: string;
+    };
     setting: {
         session: boolean;
         failureRedirect: string;
@@ -39,6 +46,13 @@ const oauthConfig: oauthConfig = {
     },
     line: {
         clientID: process.env.LINE_ID!,
+    },
+    apple: {
+        clientID: process.env.APPLE_ID!,
+        teamID: process.env.APPLE_TEAM_ID!,
+        callbackURL: "/auth/apple/callback",
+        keyID: process.env.APPLE_KEY_ID!,
+        privateKeyString: process.env.APPLE_PRIVATE_KEY!,
     },
     setting: {
         session: false,

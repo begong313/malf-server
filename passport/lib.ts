@@ -34,6 +34,9 @@ async function signUP(
         case "local":
             prefix = "lo_";
             break;
+        case "apple":
+            prefix = "a_";
+            break;
         default:
             prefix = "";
     }

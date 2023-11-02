@@ -8,6 +8,7 @@ import nunjucks from "nunjucks";
 import helmet from "helmet";
 import hpp from "hpp";
 import mongoConnect from "./schemas";
+import bodyParser from "body-parser";
 
 export class Server {
     app: express.Application;
@@ -53,6 +54,7 @@ export class Server {
         //cors origin error 대비
         this.app.use(cors());
         this.app.use(express.json());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.set("view engine", "html");
         nunjucks.configure("views", {
             express: this.app,
