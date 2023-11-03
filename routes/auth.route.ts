@@ -37,13 +37,13 @@ export class AuthRoute implements Routes {
         this.router.get(`/line`, this.auth.lineRedirect);
         this.router.get(`/line/callback`, this.auth.lineCallback);
 
-        //for apple
-        // this.router.get(`/apple`, passport.authenticate("apple"));
-        // this.router.get(
-        //     `/apple/callback`,
-        //     passport.authenticate("apple", oauthConfig.setting),
-        //     this.auth.loginCallback
-        // );
+        // for apple
+        this.router.get(`/apple`, passport.authenticate("apple"));
+        this.router.get(
+            `/apple/callback`,
+            passport.authenticate("apple", oauthConfig.setting),
+            this.auth.loginCallback
+        );
 
         //for local
         this.router.post(`/local/join`, this.auth.localJoin); //회원가입
