@@ -39,7 +39,7 @@ export class AuthRoute implements Routes {
 
         // for apple
         this.router.get(`/apple`, passport.authenticate("apple"));
-        this.router.get(
+        this.router.post(
             `/apple/callback`,
             passport.authenticate("apple", oauthConfig.setting),
             this.auth.loginCallback
