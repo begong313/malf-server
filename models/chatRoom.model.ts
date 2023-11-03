@@ -72,16 +72,18 @@ export class ChatRoomModel {
         await pool.execute(query, values);
     };
 
-    public loadChatMembers = async (
-        post_id: string
-    ): Promise<RowDataPacket[]> => {
-        const query: string = this.getLoadChatMemberQuery();
-        const values: string[] = [post_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+    public loadChatMembers = async (post_id: string) => {
+        try {
+            const query: string = this.getLoadChatMemberQuery();
+            const values: string[] = [post_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public loadMyChatRooms = async (
@@ -128,7 +130,7 @@ export class ChatRoomModel {
     private getLoadChatMemberQuery(): string {
         const query: string = `select pp.user_uniq_id as user_uniq_id, uri.user_type as user_type, uri.nation as nation, uri.nickname as nick_name,
         uri.birthday as birthday, uri.default_language as default_language ,uai.profile_pic as profile_pic 
-        from post_participation as pp join user_require_info as uri on pp.user_uniq_id = uri.user_uniq_id join user_additional_info as uai on pwj.user_uniq_id = uai.user_uniq_id 
+        from post_participation as pp join user_require_info as uri on pp.user_uniq_id = uri.user_uniq_id join user_additional_info as uai on pp.user_uniq_id = uai.user_uniq_id 
         where post_id = ?`;
         return query;
     }
