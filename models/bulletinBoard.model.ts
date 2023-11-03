@@ -106,7 +106,11 @@ class BulletinBoardModel {
     public deletePost = async (post_id: string) => {
         const query = this.getDeleteQuery();
         const values = [post_id];
-        await pool.execute(query, values);
+        try {
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public searchLike = async (
