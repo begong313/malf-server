@@ -6,16 +6,6 @@ import pool from "../lib/dbConnector";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { oauthConfig } from "../config/oauth_config";
 
-// const getAuthorization = (req) => {
-//     const coockie = req.cookies['Authorization'];
-//     if (coockie) return coockie;
-
-//     const header = req.header('Authorization');
-//     if (header) return header.split('Bearer ')[1];
-
-//     return null;
-//   }
-
 async function verifyToken(
     request: Request,
     response: Response,

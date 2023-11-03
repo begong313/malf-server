@@ -154,7 +154,9 @@ export class BulletinBoardController {
             );
             //superuser일 경우 pass
             if (userStatusCode != 100) {
-                if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+                if (
+                    !(await RightChecker.postRightCheck(user_uniq_id, post_id))
+                ) {
                     next(new HttpException(401, "권한이 없습니다"));
                     return;
                 }
@@ -183,7 +185,6 @@ export class BulletinBoardController {
         response: Response,
         next: NextFunction
     ) => {
-        // todo : 사용자가 글의 작성자인지 확인하는 검사 필요
         const post_id: string = request.params.id;
         const user_uniq_id: string = response.locals.decoded;
 
@@ -192,8 +193,11 @@ export class BulletinBoardController {
             const userStatusCode: number = await StatusChecker.getStatus(
                 user_uniq_id
             );
+            //권한 검사, 본인이거나,superuser일 경우 pass
             if (userStatusCode != 100) {
-                if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+                if (
+                    !(await RightChecker.postRightCheck(user_uniq_id, post_id))
+                ) {
                     next(new HttpException(401, "권한이 없습니다"));
                     return;
                 }
@@ -261,7 +265,7 @@ export class BulletinBoardController {
         );
         //해당 글의 작성자인지 확인
         if (userStatusCode != 100) {
-            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+            if (!(await RightChecker.postRightCheck(user_uniq_id, post_id))) {
                 next(new HttpException(401, "권한이 없습니다"));
                 return;
             }

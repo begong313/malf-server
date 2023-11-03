@@ -75,7 +75,7 @@ export class ChatRoomController {
         const user_uniq_id = response.locals.decoded;
 
         try {
-            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+            if (!(await RightChecker.postRightCheck(user_uniq_id, post_id))) {
                 next(new HttpException(401, "권한이 없습니다"));
                 return;
             }
@@ -101,10 +101,10 @@ export class ChatRoomController {
     ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
+        const applicant_uniq_id: any = request.query.id; // 입장을 신청한 사람의 아이디
 
         try {
-            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+            if (!(await RightChecker.postRightCheck(user_uniq_id, post_id))) {
                 next(new HttpException(401, "권한이 없습니다"));
                 return;
             }
@@ -143,14 +143,14 @@ export class ChatRoomController {
     ) => {
         const post_id: string = request.params.id;
         const user_uniq_id = response.locals.decoded;
-        const applicant_uniq_id: any = request.query.id; //todo : 입장을 신청한 사람의 아이디
+        const applicant_uniq_id: any = request.query.id; //입장을 신청한 사람의 아이디
 
         if (request.query.user_uniq_id == undefined) {
             next(new HttpException(400, "아이디를 찾을 수 없습니다."));
         }
 
         try {
-            if (!RightChecker.postRightCheck(user_uniq_id, post_id)) {
+            if (!(await RightChecker.postRightCheck(user_uniq_id, post_id))) {
                 next(new HttpException(401, "권한이 없습니다"));
                 return;
             }

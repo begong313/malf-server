@@ -118,8 +118,7 @@ export class UserController {
         const target_user_id = request.params.id;
 
         if (request_user_id == target_user_id) {
-            //자기 자신의 정보를 가져올 때 , 남의 정보일 때 다르게 해야할듯
-            //Todo
+            //Todo : 자기 자신의 정보를 가져올 때 , 남의 정보일 때 다르게 해야할듯
         }
         const rows = await this.userInfo.getUserProfile(target_user_id);
         response.status(200).json({

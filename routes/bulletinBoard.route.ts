@@ -46,5 +46,3 @@ export class BulletinBoardRouter implements Routes {
         this.router.post("/posts/:id/status", this.bulletinBoard.changeStatus);
     }
 }
-
-//todo : api문서 주소 업데이트. 모두 Posts로 주소를 바꿨음.

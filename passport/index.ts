@@ -12,7 +12,7 @@ function passportInit() {
     kakao();
     local();
     google();
-    // apple();
+    apple();
     //line();
 }
 
