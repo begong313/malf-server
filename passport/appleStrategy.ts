@@ -11,7 +11,7 @@ function apple() {
             {
                 clientID: process.env.APPLE_ID!,
                 teamID: process.env.APPLE_TEAM_ID!,
-                callbackURL: "/auth/apple/callback",
+                callbackURL: "https://malftravel.com/auth/apple/callback",
                 keyID: process.env.APPLE_KEY_ID!,
                 privateKeyString: process.env.APPLE_PRIVATE_KEY!,
                 passReqToCallback: true,
