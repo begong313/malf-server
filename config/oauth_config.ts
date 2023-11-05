@@ -24,6 +24,7 @@ interface oauthConfig {
         callbackURL: string;
         keyID: string;
         privateKeyString: string;
+        passReqToCallback: any;
     };
     setting: {
         session: boolean;
@@ -53,6 +54,7 @@ const oauthConfig: oauthConfig = {
         callbackURL: "/auth/apple/callback",
         keyID: process.env.APPLE_KEY_ID!,
         privateKeyString: process.env.APPLE_PRIVATE_KEY!,
+        passReqToCallback: true,
     },
     setting: {
         session: false,

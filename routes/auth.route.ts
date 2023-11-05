@@ -39,6 +39,7 @@ export class AuthRoute implements Routes {
 
         // for apple
         this.router.get(`/apple`, passport.authenticate("apple"));
+        //apple callback url은 post로 받아야함
         this.router.post(
             `/apple/callback`,
             passport.authenticate("apple", oauthConfig.setting),
