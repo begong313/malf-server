@@ -8,7 +8,7 @@ export class UserController {
     public firstSetProfile = async (request: Request, response: Response) => {
         try {
             // 전처리 부분 따로 빼야함.
-
+            console.log(request.body);
             const requiredInfo = {
                 user_uniq_id: response.locals.decoded,
                 user_type: request.body.user_type,
