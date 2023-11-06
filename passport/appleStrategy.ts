@@ -18,8 +18,6 @@ function apple() {
             },
             async (req, accessToken, refreshToken, idToken, profile, cb) => {
                 const idTokenDecoded: any = jwt.decode(idToken);
-                console.log("apple idtoken", idTokenDecoded);
-                console.log("apple profile", profile);
                 //token변환시키고 값넣어주면될듯
                 // todo : 이부분 type지정해서
                 const user_uniq_id: string = await getUserUniqId(

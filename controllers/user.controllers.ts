@@ -8,6 +8,7 @@ export class UserController {
     public firstSetProfile = async (request: Request, response: Response) => {
         try {
             // 전처리 부분 따로 빼야함.
+
             const requiredInfo = {
                 user_uniq_id: response.locals.decoded,
                 user_type: request.body.user_type,
@@ -17,7 +18,7 @@ export class UserController {
                 birthday: request.body.birthday,
                 default_language: request.body.default_language,
             };
-
+            console.log(requiredInfo);
             const imageFiles: any = request.files;
             var picDIRList: string[] = []; //사진 경로 담을 array
             //첨부사진이 없을 때
@@ -113,10 +114,11 @@ export class UserController {
         });
     };
 
+    //todo : 현재 추가정보 입력이 안되면 아얘 값이 안보이게 쿼리가 짜여져있음
     public getUserProfile = async (request: Request, response: Response) => {
         const request_user_id = response.locals.decoded;
         const target_user_id = request.params.id;
-
+        console.log("search id", target_user_id);
         if (request_user_id == target_user_id) {
             //Todo : 자기 자신의 정보를 가져올 때 , 남의 정보일 때 다르게 해야할듯
         }
