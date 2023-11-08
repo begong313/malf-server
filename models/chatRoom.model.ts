@@ -28,7 +28,7 @@ export class ChatRoomModel {
         return data;
     };
 
-    //참가 목록 받아오기
+    //참가 신청 목록 받아오기
     public loadEnterRequestChatRoom = async (
         post_id: string
     ): Promise<RowDataPacket[]> => {

@@ -19,7 +19,6 @@ export class BulletinBoardController {
         response: Response,
         next: NextFunction
     ): Promise<void> => {
-        console.log(this.bulletinBoard);
         const page: number = Number(request.query.page) || 1;
         const limit: number = Number(request.query.limit) || 100;
         const category: any = request.query.category || null;
@@ -55,9 +54,6 @@ export class BulletinBoardController {
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
-
-        console.log("Header", request);
-        console.log("imagefile?", request.files);
         if (imageFiles == undefined) {
             picDIRList.push("default.jpeg");
         } else {
