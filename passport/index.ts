@@ -13,7 +13,6 @@ function passportInit() {
     local();
     google();
     apple();
-    //line();
 }
 
 export default passportInit;

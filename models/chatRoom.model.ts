@@ -48,10 +48,14 @@ export class ChatRoomModel {
         const insertQuery = this.getInserParticipationQuery();
         const deleteQuery = this.getDeleteFromWantJoinQuery();
         const values = [post_id, applicant_uniq_id];
-        await Promise.all([
-            pool.execute(insertQuery, values),
-            pool.execute(deleteQuery, values),
-        ]);
+        try {
+            await Promise.all([
+                pool.execute(insertQuery, values),
+                pool.execute(deleteQuery, values),
+            ]);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public disagreeEnterChatRoom = async (
