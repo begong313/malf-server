@@ -226,7 +226,7 @@ export class UserModel {
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category, 
-        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status
+        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status,
         (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 0 )as local_participation,
         (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id 
@@ -258,7 +258,7 @@ export class UserModel {
         user_require_info.nation as author_nation, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic,post.location as meeting_location, 
         post.start_time as meeting_start_time , post.user_uniq_id, post.category_id as category,
-        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status
+        (select count(*) from post_like where post_id = post.post_id )as like_count, post.post_status as post_status,
         (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 0 )as local_participation,
         (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation
         from user_require_info join post on user_require_info.user_uniq_id = post.user_uniq_id join post_want_join on post.post_id = post_want_join.post_id 
