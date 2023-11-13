@@ -54,7 +54,13 @@ export class Server {
         //cors origin error 대비
         this.app.use(cors());
         this.app.use(express.json());
-        this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(
+            bodyParser.urlencoded({
+                limit: 5000000,
+                extended: true,
+                parameterLimit: 50000,
+            })
+        );
         this.app.set("view engine", "html");
         nunjucks.configure("views", {
             express: this.app,
