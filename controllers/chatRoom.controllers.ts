@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
-import { FieldPacket, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import { HttpException } from "../exeptions/HttpException";
 import { Container } from "typedi";
 import { ChatRoomModel } from "../models/chatRoom.model";
-import pool from "../lib/dbConnector";
 import Chat from "../schemas/chat";
 import mongoose from "mongoose";
 import RightChecker from "../lib/rightChecker";

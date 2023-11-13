@@ -187,12 +187,13 @@ class BulletinBoardModel {
         return query;
     }
     private getLoadPostDetailQuery(): string {
-        const query: string = `select
-        post.post_id, post.title, post.content, user_require_info.nickname as author_nickname,
+        const query: string = `select post.post_id, post.title, post.content, user_require_info.nickname as author_nickname,
         user_require_info.nation as author_nation, user_additional_info.profile_pic as author_picture, user_require_info.user_type as user_type,
         post.capacity_local as capacity_local, post.capacity_travel as capacity_travel, post.picture as meeting_pic, post.location as meeting_location,
         post.start_time as meeting_start_time, post.category_id as category, post.user_uniq_id, post.post_status as post_status,
         (select count(*) from post_like where post_id = :post_id )as like_count,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 0 )as local_participation,
+        (select count(*) from post_participation join user_require_info on post_participation.user_uniq_id = user_require_info.user_uniq_id where post_id=post.post_id and user_type = 1 )as travel_participation,
         (case when exists (select 1 from post_like where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as like_check, 
         (case when exists (select 1 from post_participation where post_id = :post_id and user_uniq_id = :user_uniq_id)then 1 else 0 end) as participation_status
         from post join user_require_info on post.user_uniq_id = user_require_info.user_uniq_id join user_additional_info on post.user_uniq_id = user_additional_info.user_uniq_id
