@@ -266,12 +266,12 @@ export class UserModel {
 
     private getSetStudentIDQuery(): string {
         const query: string =
-            "update user_id set  student_id = ?, status = '1'  where user_uniq_id = ? ";
+            "update user_id set student_id = ?, status = '1' where user_uniq_id = ?";
         return query;
     }
 
     private getSetUserStatusQuery(): string {
-        const query: string = `"update user_id set status = ? where user_uniq_id = ?";`;
+        const query: string = `update user_id set status = ? where user_uniq_id = ?;`;
         return query;
     }
 }
