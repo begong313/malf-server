@@ -53,12 +53,12 @@ export class Server {
     private useMiddleWares(): void {
         //cors origin error 대비
         this.app.use(cors());
-        this.app.use(express.json());
+        this.app.use(express.json({ limit: "50mb" }));
         this.app.use(
+            //body 용량제한
             bodyParser.urlencoded({
-                limit: 5000000,
+                limit: "50mb",
                 extended: true,
-                parameterLimit: 50000,
             })
         );
         this.app.set("view engine", "html");
