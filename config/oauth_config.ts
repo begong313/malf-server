@@ -43,7 +43,7 @@ const oauthConfig: oauthConfig = {
     google: {
         clientID: process.env.GOOGLE_ID!,
         clientSecret: process.env.GOOGLE_SECRET!,
-        callbackURL: "https://malftravel.com/auth/google/callback",
+        callbackURL: `${process.env.SERVER_URL}/auth/google/callback`,
     },
     line: {
         clientID: process.env.LINE_ID!,
