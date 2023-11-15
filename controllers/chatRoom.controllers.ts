@@ -112,7 +112,7 @@ export class ChatRoomController {
             const room = request.params.id;
             const chatdata = new Chat({
                 room: request.params.id,
-                sender: user_uniq_id || "default",
+                sender: applicant_uniq_id || "default",
                 message: "enter",
                 sendAt: Date.now(),
                 type: 2,
