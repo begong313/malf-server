@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../lib/multerCustom";
+import { uploadImage } from "../lib/multerCustom";
 import { BulletinBoardController } from "../controllers/bulletinBoard.controllers";
 
 import { verifyToken } from "../middlewares/auth.middleware.ts";
@@ -22,7 +22,7 @@ export class BulletinBoardRouter implements Routes {
         //글작성, 사진 최대 개수 10개
         this.router.post(
             `/posts`,
-            upload.array("image", 10),
+            uploadImage.array("image", 10),
             this.bulletinBoard.createPost
         );
 
@@ -32,7 +32,7 @@ export class BulletinBoardRouter implements Routes {
         // 글 업데이트
         this.router.patch(
             `/posts/:id`,
-            upload.array("image", 10),
+            uploadImage.array("image", 10),
             this.bulletinBoard.updatePost
         );
 

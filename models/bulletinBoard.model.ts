@@ -47,20 +47,25 @@ class BulletinBoardModel {
             postBody.user_uniq_id,
             postBody.category,
         ];
+        try {
+            const [results]: [ResultSetHeader, FieldPacket[]] =
+                await pool.execute(query, values);
+            const post_id: number = results.insertId;
+            const chatEnterQuery =
+                "insert into post_participation (post_id, user_uniq_id) values (?,?)";
+            await pool.execute(chatEnterQuery, [
+                post_id,
+                postBody.user_uniq_id,
+            ]);
+            ////
+
+            return post_id;
+        } catch (err) {
+            console.log(err);
+        }
         //에러처리 필요함 1. 글이 등록 실패했을때, 2. 글등록은됐는데 채팅방에 안들어가졌을때.
-        const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        const post_id: number = results.insertId;
-
+        return 0;
         //나중에 chat부분으로 따로 빼야됨~~~~
-        const chatEnterQuery =
-            "insert into post_participation (post_id, user_uniq_id) values (?,?)";
-        await pool.execute(chatEnterQuery, [post_id, postBody.user_uniq_id]);
-        ////
-
-        return post_id;
     };
 
     public loadPostDetail = async (

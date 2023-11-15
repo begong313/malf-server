@@ -8,7 +8,6 @@ export class UserController {
     public firstSetProfile = async (request: Request, response: Response) => {
         try {
             // 전처리 부분 따로 빼야함.
-            console.log(request.body);
             const requiredInfo = {
                 user_uniq_id: response.locals.decoded,
                 user_type: request.body.user_type,
@@ -18,16 +17,18 @@ export class UserController {
                 birthday: request.body.birthday,
                 default_language: request.body.default_language,
             };
-            console.log(requiredInfo);
             const imageFiles: any = request.files;
             var picDIRList: string[] = []; //사진 경로 담을 array
             //첨부사진이 없을 때
-            if (imageFiles.length == 0) {
-                picDIRList.push("default.jpeg");
+
+            if (imageFiles == undefined || imageFiles.length == 0) {
+                picDIRList.push(
+                    "https://malf-live.s3.ap-northeast-2.amazonaws.com/default.png"
+                );
             } else {
                 //사진 dir정보
                 for (var i = 0; i < imageFiles.length; i++) {
-                    picDIRList.push(imageFiles[i].filename);
+                    picDIRList.push(imageFiles[i].location);
                 }
             }
             const additionalInfo = {
@@ -61,12 +62,14 @@ export class UserController {
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
-        if (imageFiles.length == 0) {
-            picDIRList.push("default.jpeg");
+        if (imageFiles == undefined || imageFiles.length == 0) {
+            picDIRList.push(
+                "https://malf-live.s3.ap-northeast-2.amazonaws.com/default.png"
+            );
         } else {
             //사진 dir정보
             for (var i = 0; i < imageFiles.length; i++) {
-                picDIRList.push(imageFiles[i].filename);
+                picDIRList.push(imageFiles[i].location);
             }
         }
         const update_requiredInfo_data = {
@@ -146,7 +149,7 @@ export class UserController {
         } else {
             //사진 dir정보
             for (var i = 0; i < imageFiles.length; i++) {
-                picDIRList.push(imageFiles[i].filename);
+                picDIRList.push(imageFiles[i].location);
             }
         }
 

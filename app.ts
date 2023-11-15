@@ -13,11 +13,11 @@ import webSocket from "./socket";
 try {
     const app = new Server([
         new AuthRoute(),
-        new AdRoute(),
+        // new AdRoute(),
         new UserRouter(),
         new BulletinBoardRouter(),
         new ChatRoomRouter(),
-        new PictureRouter(),
+        // new PictureRouter(),
         new ChatRouter(),
         new ReportRouter(),
         new ReviewRouter(),

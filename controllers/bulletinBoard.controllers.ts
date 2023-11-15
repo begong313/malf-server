@@ -50,16 +50,17 @@ export class BulletinBoardController {
         next: NextFunction
     ) => {
         //todo : 전처리 추가해야 함
-
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
-        if (imageFiles == undefined) {
-            picDIRList.push("default.jpeg");
+        if (imageFiles == undefined || imageFiles.length == 0) {
+            picDIRList.push(
+                "https://malf-live.s3.ap-northeast-2.amazonaws.com/default.png"
+            );
         } else {
             //사진 dir정보
             for (var i = 0; i < imageFiles.length; i++) {
-                picDIRList.push(imageFiles[i].filename);
+                picDIRList.push(imageFiles[i].location);
             }
         }
         const postBody = {
@@ -120,13 +121,14 @@ export class BulletinBoardController {
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
-
-        if (imageFiles == undefined) {
-            picDIRList.push("default.jpeg");
+        if (imageFiles == undefined || imageFiles.length == 0) {
+            picDIRList.push(
+                "https://malf-live.s3.ap-northeast-2.amazonaws.com/default.png"
+            );
         } else {
             //사진 dir정보
             for (var i = 0; i < imageFiles.length; i++) {
-                picDIRList.push(imageFiles[i].filename);
+                picDIRList.push(imageFiles[i].location);
             }
         }
 

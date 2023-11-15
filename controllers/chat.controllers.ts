@@ -37,14 +37,14 @@ export class ChatController {
         const imageFiles: any = request.files;
         var picDIRList: string[] = []; //사진 경로 담을 array
         //첨부사진이 없을 때
-        if (imageFiles == undefined) {
+        if (imageFiles == undefined || imageFiles.length == 0) {
             console.log("사진못받음");
             next(new HttpException(400, "사진을 첨부해주세요"));
             return;
         } else {
             //사진 dir정보
             for (var i = 0; i < imageFiles.length; i++) {
-                picDIRList.push(imageFiles[i].filename);
+                picDIRList.push(imageFiles[i].location);
             }
         }
         const io = request.app.get("io").of("/chat");

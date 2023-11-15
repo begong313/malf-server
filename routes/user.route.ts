@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../lib/multerCustom";
+import { uploadProfile } from "../lib/multerCustom";
 import { UserController } from "../controllers/user.controllers";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
@@ -18,14 +18,14 @@ export class UserRouter implements Routes {
         // 첫 실행시 유저정보 등록
         this.router.post(
             `/profile`,
-            upload.array("image", 1),
+            uploadProfile.array("image", 1),
             this.user.firstSetProfile
         );
 
         // 유저정보 수정
         this.router.patch(
             "/profile",
-            upload.array("image", 1),
+            uploadProfile.array("image", 1),
             this.user.updateUserProfile
         );
 
@@ -40,7 +40,7 @@ export class UserRouter implements Routes {
         //학생증 등록
         this.router.post(
             "/student-id",
-            upload.array("image", 1),
+            uploadProfile.array("image", 1),
             this.user.setStudentID
         );
 

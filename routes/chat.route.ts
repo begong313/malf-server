@@ -1,6 +1,6 @@
 import express from "express";
 import { Routes } from "../interfaces/routes.interface";
-import upload from "../lib/multerCustom";
+import { uploadChat } from "../lib/multerCustom";
 import { ChatController } from "../controllers/chat.controllers";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 
@@ -21,7 +21,7 @@ export class ChatRouter implements Routes {
         //사진 보내기
         this.router.post(
             "/:id/image",
-            upload.array("image", 10),
+            uploadChat.array("image", 10),
             this.chat.sendImage
         );
     }
