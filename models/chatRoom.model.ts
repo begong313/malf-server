@@ -9,36 +9,50 @@ export class ChatRoomModel {
         post_id: string,
         user_uniq_id: string
     ): Promise<void> => {
-        const query: string = this.getInsertWantJoinQuery();
-        const values: string[] = [post_id, user_uniq_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getInsertWantJoinQuery();
+            const values: string[] = [post_id, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     //참가신청 취소
     public cancelJoinChatRoom = async (
         post_id: string,
         user_uniq_id: string
-    ): Promise<ResultSetHeader> => {
-        const query: string = this.getDeleteFromWantJoinQuery();
-        const values: string[] = [post_id, user_uniq_id];
-        const [data]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return data;
+    ) => {
+        try {
+            const query: string = this.getDeleteFromWantJoinQuery();
+            const values: string[] = [post_id, user_uniq_id];
+            const [data]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return data;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
     };
 
     //참가 신청 목록 받아오기
     public loadEnterRequestChatRoom = async (
         post_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getLoadEnterRequestQuery();
-        const values: string[] = [post_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getLoadEnterRequestQuery();
+            const values: string[] = [post_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public agreeEnterChatRoom = async (
@@ -62,18 +76,26 @@ export class ChatRoomModel {
         post_id: string,
         applicant_uniq_id: string
     ): Promise<void> => {
-        const query: string = this.getDeleteFromWantJoinQuery();
-        const values = [post_id, applicant_uniq_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getDeleteFromWantJoinQuery();
+            const values = [post_id, applicant_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public leaveChatRoom = async (
         post_id: string,
         user_uniq_id: string
     ): Promise<void> => {
-        const query: string = this.getDeleteFromParticipationQuery();
-        const values: string[] = [post_id, user_uniq_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getDeleteFromParticipationQuery();
+            const values: string[] = [post_id, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public loadChatMembers = async (post_id: string) => {

@@ -19,24 +19,32 @@ export class ReportModel {
         }
     };
     public reportUser = async (report_data: any): Promise<void> => {
-        const query: string = this.getReportUserQuery();
-        const values = [
-            report_data.user_uniq_id,
-            report_data.reported_id,
-            report_data.report_info,
-            report_data.report_email,
-        ];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getReportUserQuery();
+            const values = [
+                report_data.user_uniq_id,
+                report_data.reported_id,
+                report_data.report_info,
+                report_data.report_email,
+            ];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
     public reportChat = async (report_data: any): Promise<void> => {
-        const query: string = this.getReportChatQuery();
-        const values = [
-            report_data.user_uniq_id,
-            report_data.reported_id,
-            report_data.report_info,
-            report_data.report_email,
-        ];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getReportChatQuery();
+            const values = [
+                report_data.user_uniq_id,
+                report_data.reported_id,
+                report_data.report_info,
+                report_data.report_email,
+            ];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     private getReportPostQuery = (): string => {

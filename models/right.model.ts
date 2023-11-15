@@ -7,9 +7,9 @@ class RightModel {
         user_uniq_id: string,
         post_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getPostsUserIDSearchQuery();
-        const values = [post_id, user_uniq_id];
         try {
+            const query: string = this.getPostsUserIDSearchQuery();
+            const values = [post_id, user_uniq_id];
             const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
                 query,
                 values
@@ -25,13 +25,18 @@ class RightModel {
         user_uniq_id: string,
         chat_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getChatRoomUserIdSearchQuery();
-        const values = [chat_id, user_uniq_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getChatRoomUserIdSearchQuery();
+            const values = [chat_id, user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     private static getPostsUserIDSearchQuery(): string {

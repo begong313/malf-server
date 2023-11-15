@@ -5,99 +5,133 @@ import { FieldPacket, RowDataPacket } from "mysql2";
 @Service()
 export class UserModel {
     public setRequiredInfo = async (requiredInfo: any) => {
-        const query: string = this.getSetRequiredInfoQuery();
-        const values = [
-            requiredInfo.user_uniq_id,
-            requiredInfo.user_type,
-            requiredInfo.nation,
-            requiredInfo.gender,
-            requiredInfo.nickname,
-            requiredInfo.birthday,
-            requiredInfo.default_language,
-        ];
-        //test를 위해서 일단 삭제, update시에도 활용될 수 있음.
-        await pool.execute(
-            "delete from user_require_info where user_uniq_id = ?",
-            [requiredInfo.user_uniq_id]
-        );
-        //
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getSetRequiredInfoQuery();
+            const values = [
+                requiredInfo.user_uniq_id,
+                requiredInfo.user_type,
+                requiredInfo.nation,
+                requiredInfo.gender,
+                requiredInfo.nickname,
+                requiredInfo.birthday,
+                requiredInfo.default_language,
+            ];
+            //test를 위해서 일단 삭제, update시에도 활용될 수 있음.
+            await pool.execute(
+                "delete from user_require_info where user_uniq_id = ?",
+                [requiredInfo.user_uniq_id]
+            );
+            //
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
     public updateRequiredInfo = async (update_data: any) => {
-        const query: string = this.getUpdateRequiredInfoQuery();
-        const values = [
-            update_data.user_uniq_id,
-            update_data.user_type,
-            update_data.nation,
-            update_data.gender,
-            update_data.nickname,
-            update_data.birthday,
-            update_data.default_language,
-        ];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getUpdateRequiredInfoQuery();
+            const values = [
+                update_data.user_uniq_id,
+                update_data.user_type,
+                update_data.nation,
+                update_data.gender,
+                update_data.nickname,
+                update_data.birthday,
+                update_data.default_language,
+            ];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public setAdditionalInfo = async (additionalInfo: any) => {
-        const query: string = this.getSetAdditionalInfoQuery();
-        const values = [
-            additionalInfo.user_uniq_id,
-            additionalInfo.description,
-            additionalInfo.able_language,
-            additionalInfo.interests,
-            additionalInfo.profile_pic,
-        ];
-        //test를 위해서 일단 삭제, update시에도 활용될 수 있음.
-        await pool.execute(
-            "delete from user_additional_info where user_uniq_id = ?",
-            [additionalInfo.user_uniq_id]
-        );
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getSetAdditionalInfoQuery();
+            const values = [
+                additionalInfo.user_uniq_id,
+                additionalInfo.description,
+                additionalInfo.able_language,
+                additionalInfo.interests,
+                additionalInfo.profile_pic,
+            ];
+            //test를 위해서 일단 삭제, update시에도 활용될 수 있음.
+            await pool.execute(
+                "delete from user_additional_info where user_uniq_id = ?",
+                [additionalInfo.user_uniq_id]
+            );
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public updateAdditionalInfo = async (update_data: any) => {
-        const query: string = this.getUpdateAdditionalInfoQuery();
-        const values = [
-            update_data.user_uniq_id,
-            update_data.description,
-            update_data.able_language,
-            update_data.interests,
-            update_data.profile_pic,
-        ];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getUpdateAdditionalInfoQuery();
+            const values = [
+                update_data.user_uniq_id,
+                update_data.description,
+                update_data.able_language,
+                update_data.interests,
+                update_data.profile_pic,
+            ];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     //회원탈퇴 로직 1 : user_id 테이블에서 삭제
     public deleteUser = async (user_uniq_id: string): Promise<void> => {
-        const query: string = this.getDeleteUserQuery();
-        await pool.execute(query, [user_uniq_id]);
+        try {
+            const query: string = this.getDeleteUserQuery();
+            await pool.execute(query, [user_uniq_id]);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     //회원탈퇴 로직 2 : user_resigned 테이블에 추가
     public addResignedUser = async (user_uniq_id: string): Promise<void> => {
-        const query: string = this.getAddResignedUserQuery();
-        await pool.execute(query, [user_uniq_id]);
+        try {
+            const query: string = this.getAddResignedUserQuery();
+            await pool.execute(query, [user_uniq_id]);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public getUserStatus = async (
         user_uniq_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getGetUserStatusQuery();
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            [user_uniq_id]
-        );
-        return rows;
+        try {
+            const query: string = this.getGetUserStatusQuery();
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [user_uniq_id]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public getUserProfile = async (
         user_uniq_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getGetUserProfileQuery();
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            [user_uniq_id]
-        );
-        return rows;
+        try {
+            const query: string = this.getGetUserProfileQuery();
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [user_uniq_id]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public setStudentID = async (user_uniq_id: string, studentID: any) => {
@@ -132,8 +166,8 @@ export class UserModel {
         page: number,
         limit: number
     ) => {
-        const query: string = this.getGetWriteListQuery();
         try {
+            const query: string = this.getGetWriteListQuery();
             const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
                 query,
                 [user_uniq_id, String(limit), String((page - 1) * limit)]
@@ -149,8 +183,8 @@ export class UserModel {
         page: number,
         limit: number
     ) => {
-        const query: string = this.getGetApplyListQuery();
         try {
+            const query: string = this.getGetApplyListQuery();
             const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
                 query,
                 [user_uniq_id, String(limit), String((page - 1) * limit)]
@@ -163,8 +197,8 @@ export class UserModel {
 
     //user status 변경
     public setUserStatus = async (user_uniq_id: string, status: number) => {
-        const query: string = this.getSetUserStatusQuery();
         try {
+            const query: string = this.getSetUserStatusQuery();
             const values = [status, user_uniq_id];
             await pool.execute(query, values);
         } catch (err) {

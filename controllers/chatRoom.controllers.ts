@@ -52,7 +52,10 @@ export class ChatRoomController {
                 user_uniq_id
             );
             //todo :글이 없을때 계속 요청을 보낼수가 있음.
-            console.log(data.affectedRows);
+            if (data == null) {
+                next(new HttpException(400, "채팅방 참가 요청이 없습니다."));
+                return;
+            }
             response.status(200).json({
                 status: 200,
                 message: "채팅방 입장 요청 철회 성공 ",

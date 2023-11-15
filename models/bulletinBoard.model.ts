@@ -10,13 +10,18 @@ class BulletinBoardModel {
         page: number,
         limit: number
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getLoadPostListQuery();
-        const values = [String(limit), String((page - 1) * limit)];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getLoadPostListQuery();
+            const values = [String(limit), String((page - 1) * limit)];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     //category_id를 받아서 해당 카테고리의 게시글을 가져옴
@@ -25,13 +30,22 @@ class BulletinBoardModel {
         limit: number,
         category: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getLoadPostListWithCategoryQuery();
-        const values = [category, String(limit), String((page - 1) * limit)];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getLoadPostListWithCategoryQuery();
+            const values = [
+                category,
+                String(limit),
+                String((page - 1) * limit),
+            ];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public createPost = async (postBody: any): Promise<number> => {
@@ -72,40 +86,47 @@ class BulletinBoardModel {
         post_id: string,
         user_uniq_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getLoadPostDetailQuery();
-        const values = { post_id, user_uniq_id };
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getLoadPostDetailQuery();
+            const values = { post_id, user_uniq_id };
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public updatePost = async (
         post_id: string,
         postBody: any
     ): Promise<number> => {
-        const query = this.getUpdateQuery();
+        try {
+            const query = this.getUpdateQuery();
 
-        const values = [
-            postBody.title,
-            postBody.content,
-            postBody.picDIRList,
-            postBody.capacity_local,
-            postBody.capacity_travel,
-            postBody.meeting_location,
-            postBody.meeting_start_time,
-            postBody.category,
-            post_id,
-        ];
-        await pool.execute(query, values);
+            const values = [
+                postBody.title,
+                postBody.content,
+                postBody.picDIRList,
+                postBody.capacity_local,
+                postBody.capacity_travel,
+                postBody.meeting_location,
+                postBody.meeting_start_time,
+                postBody.category,
+                post_id,
+            ];
+            await pool.execute(query, values);
+            const [results]: [ResultSetHeader, FieldPacket[]] =
+                await pool.execute(query, values);
 
-        const [results]: [ResultSetHeader, FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-
-        return results.insertId;
+            return results.insertId;
+        } catch (err) {
+            console.log(err);
+            return -1;
+        }
     };
 
     public deletePost = async (post_id: string) => {
@@ -122,37 +143,54 @@ class BulletinBoardModel {
         post_id: string,
         user_uniq_id: string
     ): Promise<RowDataPacket[]> => {
-        const query: string = this.getDetectLikeQuert();
-        const values = [post_id, user_uniq_id];
-        const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
-            query,
-            values
-        );
-        return rows;
+        try {
+            const query: string = this.getDetectLikeQuert();
+            const values = [post_id, user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
     };
 
     public setlike = async (
         post_id: string,
         user_uniq_id: string
     ): Promise<void> => {
-        const query: string = this.getInsertLikeQuert();
-        const values = [post_id, user_uniq_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getInsertLikeQuert();
+            const values = [post_id, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public deletelike = async (
         post_id: string,
         user_uniq_id: string
     ): Promise<void> => {
-        const query: string = this.getDeleteLikeQuert();
-        const values = [post_id, user_uniq_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getDeleteLikeQuert();
+            const values = [post_id, user_uniq_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     public changeStatus = async (post_id: string): Promise<void> => {
-        const query: string = this.getChangeStatusQuery();
-        const values = [post_id];
-        await pool.execute(query, values);
+        try {
+            const query: string = this.getChangeStatusQuery();
+            const values = [post_id];
+            await pool.execute(query, values);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     private getLoadPostListQuery(): string {
