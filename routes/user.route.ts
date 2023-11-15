@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadProfile } from "../lib/multerCustom";
+import { uploadID, uploadProfile } from "../lib/multerCustom";
 import { UserController } from "../controllers/user.controllers";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
@@ -40,7 +40,7 @@ export class UserRouter implements Routes {
         //학생증 등록
         this.router.post(
             "/student-id",
-            uploadProfile.array("image", 1),
+            uploadID.array("image", 1),
             this.user.setStudentID
         );
 
