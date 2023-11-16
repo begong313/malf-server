@@ -50,7 +50,7 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "start": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=production PORT=8000 pm2 start dist/app.js -i -1\"",
+        "start": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=production PORT=8000 pm2 start dist/app.js -i max\"",
         "test": "concurrently \"npx tsc -w\" \"cross-env NODE_ENV=test PORT=8000 nodemon dist/app.js\"",
         "dev": "concurrently \"npx tsc -w\" \"nodemon dist/app.js\""
     },
