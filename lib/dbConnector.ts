@@ -6,6 +6,7 @@ const env: string = process.env.NODE_ENV || "development";
 var pool: mysql.Pool = mysql.createPool({
     ...dbConnectData,
     namedPlaceholders: true,
+    charset: "utf8mb4",
 });
 
 pool.getConnection((error, conn) => {
