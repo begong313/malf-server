@@ -204,7 +204,7 @@ export class BulletinBoardController {
 
             //글 삭제되면 Chat db 삭제되게 임시로
             try {
-                mongoose.connection.db.dropCollection(post_id);
+                mongoose.connection.dropCollection(post_id);
             } catch (err) {
                 console.log(err);
             }
