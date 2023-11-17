@@ -201,10 +201,11 @@ export class BulletinBoardController {
                 }
             }
             this.bulletinBoard.deletePost(post_id);
+            console.log(post_id);
 
             //글 삭제되면 Chat db 삭제되게 임시로
             try {
-                mongoose.connection.db.dropCollection(post_id);
+                mongoose.connection.db.dropCollection(String(post_id));
             } catch (err) {
                 console.log(err);
             }
