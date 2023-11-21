@@ -1,4 +1,4 @@
-import { AdRoute } from "./routes/ad.route";
+import { BannerRoute } from "./routes/banner.route";
 import { AuthRoute } from "./routes/auth.route";
 import { BulletinBoardRouter } from "./routes/bulletinBoard.route";
 import { ChatRouter } from "./routes/chat.route";
@@ -13,11 +13,10 @@ import webSocket from "./socket";
 try {
     const app = new Server([
         new AuthRoute(),
-        // new AdRoute(),
+        new BannerRoute(),
         new UserRouter(),
         new BulletinBoardRouter(),
         new ChatRoomRouter(),
-        // new PictureRouter(),
         new ChatRouter(),
         new ReportRouter(),
         new ReviewRouter(),
