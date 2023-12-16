@@ -24,11 +24,47 @@ export class CommunityModel {
             console.log(err);
         }
     };
+    public updatePost = async (
+        post_id: string,
+        title: string,
+        content: string,
+        picDIRList: string
+    ) => {
+        try {
+            const query: string = this.getUpdatePostQuery();
+            const values = [title, content, picDIRList, new Date(), post_id];
+            await pool.execute(query, values);
+            return post_id;
+        } catch (err) {
+            console.log(err);
+            return -1;
+        }
+    };
+    public deletePost = async (post_id: string) => {
+        try {
+            const query: string = this.getDeletePostQuery();
+            const values = [post_id];
+            await pool.execute(query, values);
+            return post_id;
+        } catch (err) {
+            console.log(err);
+            return -1;
+        }
+    };
 
     ///////////////////////query/////////////////////////
     private getCreatePostQuery = (): string => {
         const query: string =
             "insert into community (user_uniq_id, title, content, picture) values (?, ?, ?, ?)";
+        return query;
+    };
+    private getUpdatePostQuery = (): string => {
+        const query: string =
+            "update community set title=?, content=?, picture=?, update_at = ? where post_id=?";
+        return query;
+    };
+    private getDeletePostQuery = (): string => {
+        const query: string = "delete from community where post_id=?";
         return query;
     };
 }

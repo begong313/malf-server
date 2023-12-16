@@ -26,7 +26,11 @@ export class CommunityRouter implements Routes {
         // 글 세부정보 가져오기
         this.router.get("/posts/:post_id", this.community.getPost);
         // 글 수정하기
-        this.router.patch("/posts/:post_id", this.community.updatePost);
+        this.router.patch(
+            "/posts/:post_id",
+            uploadImage.array("image", 10),
+            this.community.updatePost
+        );
         // 글 삭제하기
         this.router.delete("/posts/:post_id", this.community.deletePost);
 

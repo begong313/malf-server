@@ -118,7 +118,7 @@ class BulletinBoardModel {
                 postBody.category,
                 post_id,
             ];
-            await pool.execute(query, values);
+
             const [results]: [ResultSetHeader, FieldPacket[]] =
                 await pool.execute(query, values);
 

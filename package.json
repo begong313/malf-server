@@ -44,6 +44,7 @@
         "typedi": "^0.10.0",
         "typescript": "^5.1.6",
         "url-parse": "^1.5.10",
+        "uuid": "^9.0.1",
         "winston": "^3.10.0",
         "winston-daily-rotate-file": "^4.7.1"
     },
