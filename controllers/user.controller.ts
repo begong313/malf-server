@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import Container from "typedi";
 import { UserModel } from "../models/user.model";
+import { RowDataPacket } from "mysql2";
 
 export class UserController {
     public userInfo = Container.get(UserModel);
@@ -208,5 +209,25 @@ export class UserController {
             status: 200,
             data: rows,
         });
+    };
+
+    //닉네임 중복 체크
+    public checkNickname = async (request: Request, response: Response) => {
+        const nickname: string = request.params.nickname;
+        const rows: RowDataPacket[] = await this.userInfo.checkNickname(
+            nickname
+        );
+        console.log(rows);
+        if (rows[0].count == 0) {
+            response.status(200).json({
+                status: 200,
+                message: "사용가능한 닉네임입니다.",
+            });
+        } else {
+            response.status(400).json({
+                status: 400,
+                message: "중복된 닉네임입니다.",
+            });
+        }
     };
 }

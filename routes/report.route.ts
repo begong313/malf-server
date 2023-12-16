@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
-import { ReportController } from "../controllers/report.controllers";
+import { ReportController } from "../controllers/report.controller.js";
 
 export class ReportRouter implements Routes {
     public path = "/report";

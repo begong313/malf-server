@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import passport from "passport";
-import { AuthController } from "../controllers/auth.controllers";
+import { AuthController } from "../controllers/auth.controller";
 import { oauthConfig } from "../config/oauth_config";
 import { Routes } from "../interfaces/routes.interface";
 

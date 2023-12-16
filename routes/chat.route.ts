@@ -1,7 +1,7 @@
 import express from "express";
 import { Routes } from "../interfaces/routes.interface";
 import { uploadChat } from "../lib/multerCustom";
-import { ChatController } from "../controllers/chat.controllers";
+import { ChatController } from "../controllers/chat.controller";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 
 export class ChatRouter implements Routes {

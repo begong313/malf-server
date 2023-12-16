@@ -1,6 +1,6 @@
 import express, { Router, Request, Response, response } from "express";
 import { Routes } from "../interfaces/routes.interface";
-import { BannerController } from "../controllers/banner.controllers";
+import { BannerController } from "../controllers/banner.controller";
 
 export class BannerRoute implements Routes {
     public path = "/banner";

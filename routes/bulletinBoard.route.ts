@@ -1,6 +1,6 @@
 import express from "express";
 import { uploadImage } from "../lib/multerCustom";
-import { BulletinBoardController } from "../controllers/bulletinBoard.controllers";
+import { BulletinBoardController } from "../controllers/bulletinBoard.controller";
 
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";

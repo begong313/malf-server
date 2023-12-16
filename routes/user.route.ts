@@ -1,6 +1,6 @@
 import express from "express";
 import { uploadID, uploadProfile } from "../lib/multerCustom";
-import { UserController } from "../controllers/user.controllers";
+import { UserController } from "../controllers/user.controller";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
 
@@ -52,5 +52,8 @@ export class UserRouter implements Routes {
 
         //유저가 참가 신청한 글 모아보기
         this.router.get("/:id/applylist", this.user.getApplyList);
+
+        //닉네임 중복 체크
+        this.router.get("/nickname/:nickname", this.user.checkNickname);
     }
 }

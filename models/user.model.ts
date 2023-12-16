@@ -206,6 +206,24 @@ export class UserModel {
         }
     };
 
+    //닉네임 중복 체크
+    public checkNickname = async (
+        nickname: string
+    ): Promise<RowDataPacket[]> => {
+        try {
+            const query: string = this.checkNicknameQeury();
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [nickname]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+
+    //////////////////////////////////////// query ////////////////////////////////////////
     private getSetRequiredInfoQuery(): string {
         const query: string =
             "insert into user_require_info (user_uniq_id, user_type, nation, gender, nickname, birthday, default_language) values (?,?,?,?,?,?,?)";
@@ -310,6 +328,11 @@ export class UserModel {
 
     private getSetUserStatusQuery(): string {
         const query: string = `update user_id set status = ? where user_uniq_id = ?;`;
+        return query;
+    }
+
+    private checkNicknameQeury(): string {
+        const query: string = `select count(*) as count from user_require_info where nickname = ?`;
         return query;
     }
 }
