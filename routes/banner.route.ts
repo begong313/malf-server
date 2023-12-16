@@ -2,7 +2,7 @@ import express, { Router, Request, Response, response } from "express";
 import { Routes } from "../interfaces/routes.interface";
 import { BannerController } from "../controllers/banner.controller";
 
-export class BannerRoute implements Routes {
+export class BannerRouter implements Routes {
     public path = "/banner";
     public router = express.Router();
     public bannerController = new BannerController();
