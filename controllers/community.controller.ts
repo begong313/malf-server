@@ -10,7 +10,17 @@ import { HttpException } from "../exeptions/HttpException";
 export class CommunityController {
     public community = Container.get(CommunityModel);
     //글 리스트 가져오기
-    public getPosts = async (req: Request, res: Response) => {};
+    public getPosts = async (req: Request, res: Response) => {
+        try {
+            const limit: number = Number(req.query.limit) || 10;
+            const page: number = Number(req.query.page) || 1;
+            const posts = await this.community.getPosts(limit, page);
+            res.status(200).json({ status: 200, data: posts });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
     //글 쓰기
     public createPost = async (request: Request, response: Response) => {
         try {
@@ -41,7 +51,27 @@ export class CommunityController {
         }
     };
     //글 세부정보 가져오기
-    public getPost = async (req: Request, res: Response) => {};
+    public getPost = async (req: Request, res: Response) => {
+        try {
+            const user_uniq_id = res.locals.decoded;
+            const post_id = req.params.post_id;
+
+            const post = await this.community.getPost(user_uniq_id, post_id);
+            const reply = await this.community.getReply(post_id, 10, 1);
+
+            if (post == -1) {
+                res.status(500).json({ status: 500, message: "없는글" });
+                return;
+            }
+            //본문에 댓글 추가
+            post[0].reply = reply;
+
+            res.status(200).json({ status: 200, data: post });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
 
     //글 수정하기
     public updatePost = async (
@@ -132,12 +162,111 @@ export class CommunityController {
     };
 
     //댓글 가져오기
-    public getComments = async (req: Request, res: Response) => {};
+    public getReply = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        try {
+            const post_id = request.params.post_id;
+            const limit: number = Number(request.query.limit) || 10;
+            const page: number = Number(request.query.page) || 1;
+            console.log(limit, page);
+            const reply = await this.community.getReply(post_id, limit, page);
+            if (reply == -1) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 200,
+                data: reply,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
+
     //댓글달기
-    public createComment = async (req: Request, res: Response) => {};
+    public createReply = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const post_id = request.params.post_id;
+        const { content } = request.body;
+
+        try {
+            const reply_id = await this.community.createReply(
+                post_id,
+                user_uniq_id,
+                content
+            );
+            if (reply_id == -1) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 201,
+                data: reply_id,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
 
     //글 스크랩(좋아요)
-    public scrapPost = async (req: Request, res: Response) => {};
+    public scrapPost = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const post_id = request.params.post_id;
+
+        try {
+            const results = await this.community.addScrap(
+                post_id,
+                user_uniq_id
+            );
+            if (results == false) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 201,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
     //글 스크랩 취소()
-    public unscrapPost = async (req: Request, res: Response) => {};
+    public unscrapPost = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const post_id = request.params.post_id;
+
+        try {
+            const results = await this.community.deleteScrap(
+                post_id,
+                user_uniq_id
+            );
+            if (results == false) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 201,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
 }

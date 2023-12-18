@@ -20,5 +20,15 @@ export class ReportRouter implements Routes {
         this.router.post("/user", this.report.reportUser);
         // 채팅 신고
         this.router.post("/chat", this.report.reportChat);
+
+        //커뮤니티 글 신고
+        this.router.post("/community", this.report.reportCommunity);
+        //커뮤니티 댓글 신고
+        this.router.post("/community/reply", this.report.reportCommunityReply);
+        //커뮤니티 대댓글 신고
+        this.router.post(
+            "/community/rereply",
+            this.report.reportCommunityReReply
+        );
     }
 }

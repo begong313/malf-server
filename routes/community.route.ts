@@ -35,9 +35,9 @@ export class CommunityRouter implements Routes {
         this.router.delete("/posts/:post_id", this.community.deletePost);
 
         //댓글 가져오기
-        this.router.get("/posts/:post_id/reply", this.community.getComments);
+        this.router.get("/posts/:post_id/reply", this.community.getReply);
         //댓글달기
-        this.router.post("/posts/:post_id/reply", this.community.createComment);
+        this.router.post("/posts/:post_id/reply", this.community.createReply);
 
         //글 스크랩(좋아요)
         this.router.post("/posts/:post_id/scrap", this.community.scrapPost);

@@ -230,4 +230,50 @@ export class UserController {
             });
         }
     };
+    public getCommunityList = async (request: Request, response: Response) => {
+        const user_uniq_id = request.params.id;
+
+        const rows = await this.userInfo.getCommunityList(user_uniq_id);
+        try {
+            response.status(200).json({
+                status: 200,
+                data: rows,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
+    public getCommunityReplyList = async (
+        request: Request,
+        response: Response
+    ) => {
+        const user_uniq_id = request.params.id;
+        const rows = await this.userInfo.getCommunityReplyList(user_uniq_id);
+        try {
+            response.status(200).json({
+                status: 200,
+                data: rows,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
+    public getCommunityScrapList = async (
+        request: Request,
+        response: Response
+    ) => {
+        const user_uniq_id = request.params.id;
+        const rows = await this.userInfo.getCommunityScrapList(user_uniq_id);
+        try {
+            response.status(200).json({
+                status: 200,
+                data: rows,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
 }
