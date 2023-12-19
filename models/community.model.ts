@@ -169,8 +169,8 @@ export class CommunityModel {
     };
     private getGetPostQuery = (): string => {
         const query: string = `select c.post_id, title, content, picture, r.nickname as author_nickname, r.user_type , c.user_uniq_id, i.status, c.create_at, c.update_at,(select count(*) from community_reply where community_post_id = c.post_id) as reply_count,
-                                (case when exists (select 1 from community_scrap as s where s.post_id = c.post_id and s.user_uniq_id = ?)then 1 else 0 end) as scrap_check                    
-                                from community as c join user_require_info as r on c.user_uniq_id = r.user_uniq_id join user_id as i on c.user_uniq_id = i.user_uniq_id
+                                (case when exists (select 1 from community_scrap as s where s.post_id = c.post_id and s.user_uniq_id = ?)then 1 else 0 end) as scrap_check, a.profile_pic as author_picture             
+                                from community as c join user_require_info as r on c.user_uniq_id = r.user_uniq_id join user_id as i on c.user_uniq_id = i.user_uniq_id join user_additional_info as a on c.user_uniq_id = a.user_uniq_id
                                 where c.post_id=?;`;
         return query;
     };
