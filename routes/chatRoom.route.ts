@@ -1,5 +1,5 @@
 import express from "express";
-import { ChatRoomController } from "../controllers/chatRoom.controllers";
+import { ChatRoomController } from "../controllers/chatRoom.controller";
 
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";

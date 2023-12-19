@@ -206,6 +206,67 @@ export class UserModel {
         }
     };
 
+    //닉네임 중복 체크
+    public checkNickname = async (
+        nickname: string
+    ): Promise<RowDataPacket[]> => {
+        try {
+            const query: string = this.checkNicknameQeury();
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                [nickname]
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+
+    public getCommunityList = async (user_uniq_id: string) => {
+        try {
+            const query: string = this.getGetCommunityListQuery();
+            const data = [user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                data
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+    //토의필요
+    public getCommunityReplyList = async (user_uniq_id: string) => {
+        try {
+            const query: string = this.getGetCommunityReplyListQuery();
+            const data = [user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+    public getCommunityScrapList = async (user_uniq_id: string) => {
+        try {
+            const query: string = this.getGetCommunityScrapListQuery();
+            const data = [user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                data
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+
+    //////////////////////////////////////// query ////////////////////////////////////////
     private getSetRequiredInfoQuery(): string {
         const query: string =
             "insert into user_require_info (user_uniq_id, user_type, nation, gender, nickname, birthday, default_language) values (?,?,?,?,?,?,?)";
@@ -310,6 +371,38 @@ export class UserModel {
 
     private getSetUserStatusQuery(): string {
         const query: string = `update user_id set status = ? where user_uniq_id = ?;`;
+        return query;
+    }
+
+    private checkNicknameQeury(): string {
+        const query: string = `select count(*) as count from user_require_info where nickname = ?`;
+        return query;
+    }
+
+    private getGetCommunityListQuery(): string {
+        const query: string = `select post_id, title, content, picture, r.nickname as author_nickname, r.user_type , c.user_uniq_id, i.status, c.create_at, c.update_at,
+        (select count(*) from community_reply where community_post_id = c.post_id) as reply_count, post_status, create_at, update_at
+        from community as c join user_require_info as r on c.user_uniq_id = r.user_uniq_id join user_id as i on c.user_uniq_id = i.user_uniq_id
+        where c.user_uniq_id = ?
+        order by create_at desc
+        `;
+        return query;
+    }
+
+    private getGetCommunityReplyListQuery(): string {
+        const query: string = `select reply_id, content, 
+        `;
+        return query;
+    }
+
+    private getGetCommunityScrapListQuery(): string {
+        const query: string = `select c.post_id, title, content, picture, r.nickname as author_nickname, r.user_type , c.user_uniq_id, i.status, c.create_at, c.update_at,
+        (select count(*) from community_reply where community_post_id = c.post_id) as reply_count, post_status, create_at, update_at
+        from community as c join user_require_info as r on c.user_uniq_id = r.user_uniq_id join user_id as i on c.user_uniq_id = i.user_uniq_id join community_scrap as s on c.post_id = s.post_id
+        where c.user_uniq_id = ?
+        order by create_at desc
+        
+        `;
         return query;
     }
 }

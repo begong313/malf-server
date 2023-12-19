@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import { Routes } from "../interfaces/routes.interface";
-import { ReviewController } from "../controllers/review.controllers.js";
+import { ReviewController } from "../controllers/review.controller.js";
 
 export class ReviewRouter implements Routes {
     public path = "/review";

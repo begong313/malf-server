@@ -38,6 +38,23 @@ class RightModel {
             return [];
         }
     };
+    public static communityRightCheck = async (
+        user_uniq_id: string,
+        post_id: string
+    ): Promise<RowDataPacket[]> => {
+        try {
+            const query: string = this.getCommunityUserIDSearchQuery();
+            const values = [post_id, user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
 
     private static getPostsUserIDSearchQuery(): string {
         const query: string = `select count(*) >0 as result from post where post_id = ? and user_uniq_id = ?`;
@@ -46,6 +63,10 @@ class RightModel {
 
     private static getChatRoomUserIdSearchQuery(): string {
         const query: string = `select count(*) >0 as result from post_participation where post_id = ? and user_uniq_id = ?`;
+        return query;
+    }
+    private static getCommunityUserIDSearchQuery(): string {
+        const query: string = `select count(*) >0 as result from community where post_id = ? and user_uniq_id = ?`;
         return query;
     }
 }
