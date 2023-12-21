@@ -105,6 +105,7 @@ export class CommunityModel {
             return -1;
         }
     };
+
     public getReply = async (
         post_id: string,
         limit: number,
@@ -123,6 +124,29 @@ export class CommunityModel {
             );
 
             return rows;
+        } catch (err) {
+            console.log(err);
+            return -1;
+        }
+    };
+    public updateReply = async (reply_id: string, content: string) => {
+        try {
+            const query: string = this.getUpdateReplyQuery();
+            const values = [content, new Date(), reply_id];
+            await pool.execute(query, values);
+            return reply_id;
+        } catch (err) {
+            console.log(err);
+            return -1;
+        }
+    };
+
+    public deleteReply = async (reply_id: string) => {
+        try {
+            const query: string = this.getDeleteReplyQuery();
+            const values = [reply_id];
+            await pool.execute(query, values);
+            return reply_id;
         } catch (err) {
             console.log(err);
             return -1;
@@ -218,6 +242,15 @@ export class CommunityModel {
                                 c.community_post_id = ?
                                 order by c.create_at
                                 Limit ? offset ? ;`;
+        return query;
+    };
+    private getUpdateReplyQuery = (): string => {
+        const query: string =
+            "update community_reply set content=?, update_at = ? where reply_id=?";
+        return query;
+    };
+    private getDeleteReplyQuery = (): string => {
+        const query: string = "delete from community_reply where reply_id=?";
         return query;
     };
     private getAddScrapQuery = (): string => {

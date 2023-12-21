@@ -6,6 +6,7 @@ import { CommunityModel } from "../models/community.model";
 import StatusChecker from "../lib/statusChecker";
 import RightChecker from "../lib/rightChecker";
 import { HttpException } from "../exeptions/HttpException";
+import { request } from "http";
 
 export class CommunityController {
     public community = Container.get(CommunityModel);
@@ -210,6 +211,87 @@ export class CommunityController {
             return response.status(201).json({
                 status: 201,
                 data: reply_id,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
+    //댓글 삭제
+    public deleteReply = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const reply_id = request.params.reply_id;
+
+        try {
+            const userStatusCode: number = await StatusChecker.getStatus(
+                user_uniq_id
+            );
+            if (userStatusCode != 100) {
+                if (
+                    !(await RightChecker.communityRelpyRightCheck(
+                        user_uniq_id,
+                        reply_id
+                    ))
+                ) {
+                    next(new HttpException(401, "권한이 없습니다"));
+                    return;
+                }
+            }
+
+            const results = await this.community.deleteReply(reply_id);
+            if (results == -1) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 201,
+            });
+        } catch (err) {
+            console.log(err);
+            response.status(500).json({ status: 500, message: "서버 에러" });
+        }
+    };
+    //댓글 수정
+    public updateReply = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ) => {
+        const user_uniq_id = response.locals.decoded;
+        const reply_id = request.params.reply_id;
+        const { content } = request.body;
+
+        try {
+            const userStatusCode: number = await StatusChecker.getStatus(
+                user_uniq_id
+            );
+            if (userStatusCode != 100) {
+                if (
+                    !(await RightChecker.communityRelpyRightCheck(
+                        user_uniq_id,
+                        reply_id
+                    ))
+                ) {
+                    next(new HttpException(401, "권한이 없습니다"));
+                    return;
+                }
+            }
+
+            const results = await this.community.updateReply(
+                reply_id,
+
+                content
+            );
+            if (results == -1) {
+                next(new HttpException(500, "서버 에러"));
+                return;
+            }
+            return response.status(201).json({
+                status: 201,
             });
         } catch (err) {
             console.log(err);

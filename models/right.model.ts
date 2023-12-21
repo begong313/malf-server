@@ -56,6 +56,24 @@ class RightModel {
         }
     };
 
+    public static communityReplyRightCheck = async (
+        user_uniq_id: string,
+        reply_id: string
+    ): Promise<RowDataPacket[]> => {
+        try {
+            const query: string = this.getCommunityReplyUserIDSearchQuery();
+            const values = [reply_id, user_uniq_id];
+            const [rows]: [RowDataPacket[], FieldPacket[]] = await pool.execute(
+                query,
+                values
+            );
+            return rows;
+        } catch (err) {
+            console.log(err);
+            return [];
+        }
+    };
+
     private static getPostsUserIDSearchQuery(): string {
         const query: string = `select count(*) >0 as result from post where post_id = ? and user_uniq_id = ?`;
         return query;
@@ -67,6 +85,10 @@ class RightModel {
     }
     private static getCommunityUserIDSearchQuery(): string {
         const query: string = `select count(*) >0 as result from community where post_id = ? and user_uniq_id = ?`;
+        return query;
+    }
+    private static getCommunityReplyUserIDSearchQuery(): string {
+        const query: string = `select count(*) >0 as result from community_reply where reply_id = ? and user_uniq_id = ?`;
         return query;
     }
 }
