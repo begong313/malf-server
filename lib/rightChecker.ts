@@ -27,6 +27,20 @@ class RightChecker {
         }
         return false;
     };
+    public static communityRelpyRightCheck = async (
+        user_uniq_id: string,
+        reply_id: string
+    ): Promise<boolean> => {
+        const rows = await RightModel.communityReplyRightCheck(
+            user_uniq_id,
+            reply_id
+        );
+
+        if (rows[0].result != 0) {
+            return true;
+        }
+        return false;
+    };
 
     public static chatRightCheck = async (
         user_uniq_id: string,

@@ -38,6 +38,16 @@ export class CommunityRouter implements Routes {
         this.router.get("/posts/:post_id/reply", this.community.getReply);
         //댓글달기
         this.router.post("/posts/:post_id/reply", this.community.createReply);
+        //댓글 삭제
+        this.router.delete(
+            `/posts/:post_id/reply/:reply_id`,
+            this.community.deleteReply
+        );
+        //댓글 수정
+        this.router.patch(
+            `/posts/:post_id/reply/:reply_id`,
+            this.community.updateReply
+        );
 
         //글 스크랩(좋아요)
         this.router.post("/posts/:post_id/scrap", this.community.scrapPost);
