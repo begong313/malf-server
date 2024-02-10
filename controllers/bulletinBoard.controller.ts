@@ -10,6 +10,7 @@ import { Container } from "typedi";
 import mongoose from "mongoose";
 import StatusChecker from "../lib/statusChecker";
 import RightChecker from "../lib/rightChecker";
+import fcm from "../lib/firebase";
 
 export class BulletinBoardController {
     public bulletinBoard = Container.get(BulletinBoardModel);
@@ -63,6 +64,7 @@ export class BulletinBoardController {
                 picDIRList.push(imageFiles[i].location);
             }
         }
+
         const postBody = {
             title: request.body.title,
             content: request.body.content,
@@ -76,7 +78,25 @@ export class BulletinBoardController {
         };
 
         const post_id: number = await this.bulletinBoard.createPost(postBody);
-        await mongoose.connection.createCollection(String(post_id));
+        try {
+            await mongoose.connection.createCollection(String(post_id));
+        } catch (err) {
+            console.log("몽고에러");
+        }
+        try {
+            fcm.fcmAdmin
+                .messaging()
+                .createTopic(post_id.toString())
+                .then((response: any) => {
+                    console.log("Successfully created topic:", response);
+                })
+                .catch((error: any) => {
+                    console.error("Error creating topic:", error);
+                });
+        } catch (err) {
+            console.log(err);
+        }
+
         response.status(200).json({
             status: 200,
             post_id: post_id,

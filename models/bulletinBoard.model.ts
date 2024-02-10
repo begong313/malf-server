@@ -62,6 +62,7 @@ class BulletinBoardModel {
             postBody.category,
         ];
         try {
+            console.log(values);
             const [results]: [ResultSetHeader, FieldPacket[]] =
                 await pool.execute(query, values);
             const post_id: number = results.insertId;
